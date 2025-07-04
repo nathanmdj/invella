@@ -1,9 +1,14 @@
-import { InvitationCard } from '@kit/invitations/components/invitation-card';
-import { ShareInvitation } from '@kit/invitations/components/share-invitation';
+'use client';
+
+import { InvitationCard } from '@kit/invitations/invitation-card';
+import { ShareInvitation } from '@kit/invitations/share-invitation';
 import { Button } from '@kit/ui/button';
 import { Card, CardContent } from '@kit/ui/card';
 import { Calendar, MapPin } from 'lucide-react';
+import { Skeleton } from '@kit/ui/skeleton';
+import { format } from 'date-fns';
 import Link from 'next/link';
+import { usePublicInvitation } from '@kit/invitations/hooks/use-invitation-data';
 
 interface InvitationPageProps {
   params: {
@@ -13,19 +18,46 @@ interface InvitationPageProps {
 
 export default function InvitationPage({ params }: InvitationPageProps) {
   const invitationId = params.id;
+  const { data: invitation, isLoading, error } = usePublicInvitation(invitationId);
 
-  // Mock data - in real app, this would come from useInvitationData hook
-  const invitation = {
-    id: invitationId,
-    title: "Sarah & John's Wedding",
-    description: "Join us for our special day as we celebrate our love and commitment to each other.",
-    event_date: "2024-08-15T16:00:00Z",
-    location: "Garden Rose Venue, 123 Wedding Lane, San Francisco, CA",
-    image_url: "/images/wedding-template.jpg",
-    template_id: "elegant-wedding",
-    rsvp_deadline: "2024-08-01T23:59:59Z",
-    is_public: true,
-  };
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
+        <div className="container mx-auto px-4 py-8 max-w-2xl">
+          <div className="text-center py-12">
+            <h2 className="text-xl font-semibold mb-2">Invitation Not Found</h2>
+            <p className="text-muted-foreground mb-4">
+              This invitation doesn&apos;t exist or is not publicly accessible.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading || !invitation) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
+        <div className="container mx-auto px-4 py-8 max-w-2xl">
+          <div className="mb-8">
+            <Skeleton className="h-96 w-full" />
+          </div>
+          <Card className="mb-8">
+            <CardContent className="p-6">
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-32" />
+                <Skeleton className="h-4 w-48" />
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-4 w-64" />
+              </div>
+            </CardContent>
+          </Card>
+          <Skeleton className="h-12 w-full mb-4" />
+          <Skeleton className="h-4 w-48 mx-auto" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
@@ -39,25 +71,29 @@ export default function InvitationPage({ params }: InvitationPageProps) {
         <Card className="mb-8">
           <CardContent className="p-6">
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="font-medium">Date & Time</p>
-                  <p className="text-sm text-muted-foreground">
-                    August 15, 2024 at 4:00 PM
-                  </p>
+              {invitation.event_date && (
+                <div className="flex items-start gap-3">
+                  <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="font-medium">Date & Time</p>
+                    <p className="text-sm text-muted-foreground">
+                      {format(new Date(invitation.event_date), 'PPP')} at {format(new Date(invitation.event_date), 'p')}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
               
-              <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="font-medium">Location</p>
-                  <p className="text-sm text-muted-foreground">
-                    {invitation.location}
-                  </p>
+              {invitation.location && (
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div>
+                    <p className="font-medium">Location</p>
+                    <p className="text-sm text-muted-foreground">
+                      {invitation.location}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -70,9 +106,11 @@ export default function InvitationPage({ params }: InvitationPageProps) {
             </Link>
           </Button>
           
-          <p className="text-sm text-center text-muted-foreground">
-            Please respond by August 1, 2024
-          </p>
+          {invitation.rsvp_deadline && (
+            <p className="text-sm text-center text-muted-foreground">
+              Please respond by {format(new Date(invitation.rsvp_deadline), 'PPP')}
+            </p>
+          )}
         </div>
 
         {/* Share Invitation */}
@@ -81,7 +119,7 @@ export default function InvitationPage({ params }: InvitationPageProps) {
             <h3 className="font-semibold mb-4">Share This Invitation</h3>
             <ShareInvitation 
               invitationId={invitationId} 
-              title={invitation.title}
+              invitationTitle={invitation.title}
             />
           </CardContent>
         </Card>
