@@ -6,7 +6,7 @@ import { cn } from '@kit/ui/utils';
 import { RootProviders } from '~/components/root-providers';
 import { heading, sans } from '~/lib/fonts';
 import { createI18nServerInstance } from '~/lib/i18n/i18n.server';
-import { generateRootMetadata } from '~/lib/root-metdata';
+import { generateRootMetadata, generateRootViewport } from '~/lib/root-metdata';
 
 import '../styles/globals.css';
 
@@ -24,9 +24,9 @@ export default async function RootLayout({
       <body>
         <RootProviders theme={theme} lang={language}>
           {children}
+          
+          <Toaster richColors={true} theme={theme} position="top-center" />
         </RootProviders>
-
-        <Toaster richColors={true} theme={theme} position="top-center" />
       </body>
     </html>
   );
@@ -57,3 +57,4 @@ async function getTheme() {
 }
 
 export const generateMetadata = generateRootMetadata;
+export const generateViewport = generateRootViewport;

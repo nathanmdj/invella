@@ -1,4 +1,4 @@
-import { Home, User } from 'lucide-react';
+import { Home, User, Plus, Calendar, Users } from 'lucide-react';
 import { z } from 'zod';
 
 import { NavigationConfigSchema } from '@kit/ui/navigation-schema';
@@ -12,10 +12,15 @@ const routes = [
     label: 'common:routes.application',
     children: [
       {
-        label: 'common:routes.home',
-        path: pathsConfig.app.home,
+        label: 'Dashboard',
+        path: '/dashboard',
         Icon: <Home className={iconClasses} />,
         end: true,
+      },
+      {
+        label: 'Create Invitation',
+        path: '/create',
+        Icon: <Plus className={iconClasses} />,
       },
     ],
   },

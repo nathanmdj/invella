@@ -12,6 +12,7 @@ import { If } from '@kit/ui/if';
 import { VersionUpdater } from '@kit/ui/version-updater';
 
 import { AuthProvider } from '~/components/auth-provider';
+import { PWAManager } from '~/components/pwa-manager';
 import appConfig from '~/config/app.config';
 import authConfig from '~/config/auth.config';
 import featuresFlagConfig from '~/config/feature-flags.config';
@@ -22,17 +23,19 @@ import { ReactQueryProvider } from './react-query-provider';
 
 const captchaSiteKey = authConfig.captchaTokenSiteKey;
 
-const CaptchaTokenSetter = dynamic(async () => {
-  if (!captchaSiteKey) {
-    return Promise.resolve(() => null);
+// Simplify the dynamic import to avoid SSR issues
+const CaptchaTokenSetter = dynamic(
+  () => import('@kit/auth/captcha/client').then(mod => ({ 
+    default: mod.CaptchaTokenSetter 
+  })),
+  { 
+    ssr: false,
+    loading: () => null
   }
+);
 
-  const { CaptchaTokenSetter } = await import('@kit/auth/captcha/client');
-
-  return {
-    default: CaptchaTokenSetter,
-  };
-});
+// Create a fallback component for when captcha is not enabled
+const NoCaptcha = () => null;
 
 export function RootProviders({
   lang,
@@ -48,7 +51,11 @@ export function RootProviders({
     <ReactQueryProvider>
       <I18nProvider settings={i18nSettings} resolver={i18nResolver}>
         <CaptchaProvider>
+          {captchaSiteKey ? (
           <CaptchaTokenSetter siteKey={captchaSiteKey} />
+          ) : (
+            <NoCaptcha />
+          )}
 
           <AuthProvider>
             <ThemeProvider
@@ -62,6 +69,8 @@ export function RootProviders({
             </ThemeProvider>
           </AuthProvider>
         </CaptchaProvider>
+
+        <PWAManager />
 
         <If condition={featuresFlagConfig.enableVersionUpdater}>
           <VersionUpdater />

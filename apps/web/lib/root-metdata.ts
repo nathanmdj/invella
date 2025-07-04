@@ -1,4 +1,4 @@
-import { Metadata } from 'next';
+import { Metadata, Viewport } from 'next';
 
 import { headers } from 'next/headers';
 
@@ -35,5 +35,20 @@ export const generateRootMetadata = async (): Promise<Metadata> => {
       icon: '/images/favicon/favicon.ico',
       apple: '/images/favicon/apple-touch-icon.png',
     },
+    manifest: '/images/favicon/site.webmanifest',
+  };
+};
+
+/**
+ * @name generateRootViewport
+ * @description Generates the root viewport for the application
+ */
+export const generateRootViewport = (): Viewport => {
+  return {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    themeColor: '#6366f1',
   };
 };
