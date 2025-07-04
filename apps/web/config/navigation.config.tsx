@@ -13,7 +13,7 @@ const routes = [
     children: [
       {
         label: 'Dashboard',
-        path: '/dashboard',
+        path: '/home',
         Icon: <Home className={iconClasses} />,
         end: true,
       },
