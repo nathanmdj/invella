@@ -19,6 +19,7 @@ import type { InvitationWithStats, InvitationFilters } from '../schema/invitatio
 
 interface InvitationListProps {
   onCreateNew?: () => void;
+  onClick?: (invitation: InvitationWithStats) => void;
   onEdit?: (invitation: InvitationWithStats) => void;
   onDelete?: (invitation: InvitationWithStats) => void;
   onShare?: (invitation: InvitationWithStats) => void;
@@ -27,6 +28,7 @@ interface InvitationListProps {
 
 export function InvitationList({
   onCreateNew,
+  onClick,
   onEdit,
   onDelete,
   onShare,
@@ -164,6 +166,7 @@ export function InvitationList({
             <InvitationCard
               key={invitation.id}
               invitation={invitation}
+              onClick={onClick}
               onEdit={onEdit}
               onDelete={onDelete}
               onShare={onShare}

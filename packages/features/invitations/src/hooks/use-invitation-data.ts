@@ -228,3 +228,55 @@ export function useDeleteInvitation() {
     },
   });
 }
+
+// Hook to fetch a public invitation with stats (for public invite pages)
+export function usePublicInvitation(id: string) {
+  const supabase = useSupabase();
+
+  return useQuery({
+    queryKey: ['public-invitation', id],
+    queryFn: async (): Promise<InvitationWithStats> => {
+      const { data, error } = await supabase
+        .from('invitations')
+        .select(`
+          *,
+          guest_count:guests(count),
+          guests(
+            rsvp_responses(
+              status
+            )
+          )
+        `)
+        .eq('id', id)
+        .eq('is_public', true)
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // Process the data to include stats
+      const rsvpResponses = data.guests?.flatMap((guest: any) => 
+        guest.rsvp_responses || []
+      ) || [];
+
+      return {
+        ...data,
+        description: data.description ?? undefined,
+        event_date: data.event_date ?? undefined,
+        image_url: data.image_url ?? undefined,
+        location: data.location ?? undefined,
+        updated_by: data.updated_by ?? undefined,
+        template_id: data.template_id ?? undefined,
+        max_guests: data.max_guests ?? undefined,
+        rsvp_deadline: data.rsvp_deadline ?? undefined,
+        custom_fields: (data.custom_fields as Record<string, any>) ?? {},
+        guest_count: data.guest_count?.[0]?.count || 0,
+        rsvp_count: rsvpResponses.length || 0,
+        attending_count: rsvpResponses.filter((r: any) => r.status === 'attending').length || 0,
+        not_attending_count: rsvpResponses.filter((r: any) => r.status === 'not_attending').length || 0,
+      };
+    },
+    enabled: !!id,
+  });
+}

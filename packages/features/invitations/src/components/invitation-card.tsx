@@ -15,6 +15,7 @@ import type { InvitationWithStats } from '../schema/invitation.schema';
 
 interface InvitationCardProps {
   invitation: InvitationWithStats;
+  onClick?: (invitation: InvitationWithStats) => void;
   onEdit?: (invitation: InvitationWithStats) => void;
   onDelete?: (invitation: InvitationWithStats) => void;
   onShare?: (invitation: InvitationWithStats) => void;
@@ -23,6 +24,7 @@ interface InvitationCardProps {
 
 export function InvitationCard({
   invitation,
+  onClick,
   onEdit,
   onDelete,
   onShare,
@@ -32,8 +34,17 @@ export function InvitationCard({
   const isUpcoming = eventDate && eventDate > new Date();
   const isPast = eventDate && eventDate < new Date();
 
+  const handleCardClick = () => {
+    if (onClick) {
+      onClick(invitation);
+    }
+  };
+
   return (
-    <Card className="group hover:shadow-md transition-shadow">
+    <Card 
+      className={`group hover:shadow-md transition-shadow ${onClick ? 'cursor-pointer' : ''}`}
+      onClick={handleCardClick}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1 min-w-0">
@@ -48,7 +59,12 @@ export function InvitationCard({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="opacity-0 group-hover:opacity-100"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <span className="sr-only">Open menu</span>
                 <svg
                   width="15"

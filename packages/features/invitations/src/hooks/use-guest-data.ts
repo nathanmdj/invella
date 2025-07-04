@@ -39,7 +39,10 @@ export function useGuests(invitationId: string) {
 
       return (data || []).map((guest: any) => ({
         ...guest,
-        rsvp_response: guest.rsvp_response?.[0] || null,
+        email: guest.email || undefined,
+        phone: guest.phone || undefined,
+        guest_code: guest.guest_code || '',
+        rsvp_response: guest.rsvp_response?.[0] || undefined,
       }));
     },
     enabled: !!invitationId,
@@ -63,7 +66,12 @@ export function useGuest(id: string) {
         throw new Error(error.message);
       }
 
-      return data;
+      return {
+        ...data,
+        email: data.email || undefined,
+        phone: data.phone || undefined,
+        guest_code: data.guest_code || '',
+      };
     },
     enabled: !!id,
   });
@@ -92,7 +100,16 @@ export function useGuestByCode(code: string) {
 
       return {
         ...data,
-        rsvp_response: data.rsvp_response?.[0] || null,
+        email: data.email || undefined,
+        phone: data.phone || undefined,
+        guest_code: data.guest_code || '',
+        rsvp_response: data.rsvp_response?.[0] ? {
+          ...data.rsvp_response[0],
+          status: data.rsvp_response[0].status as 'pending' | 'attending' | 'not_attending',
+          dietary_restrictions: data.rsvp_response[0].dietary_restrictions || undefined,
+          plus_one_names: data.rsvp_response[0].plus_one_names || undefined,
+          message: data.rsvp_response[0].message || undefined,
+        } : undefined,
       };
     },
     enabled: !!code,
@@ -116,7 +133,12 @@ export function useCreateGuest() {
         throw new Error(error.message);
       }
 
-      return data;
+      return {
+        ...data,
+        email: data.email || undefined,
+        phone: data.phone || undefined,
+        guest_code: data.guest_code || '',
+      };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ 
@@ -147,7 +169,12 @@ export function useBulkImportGuests() {
         throw new Error(error.message);
       }
 
-      return data;
+      return (data || []).map((guest: any) => ({
+        ...guest,
+        email: guest.email || undefined,
+        phone: guest.phone || undefined,
+        guest_code: guest.guest_code || '',
+      }));
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ 
@@ -175,7 +202,12 @@ export function useUpdateGuest() {
         throw new Error(error.message);
       }
 
-      return data;
+      return {
+        ...data,
+        email: data.email || undefined,
+        phone: data.phone || undefined,
+        guest_code: data.guest_code || '',
+      };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ 
@@ -208,4 +240,28 @@ export function useDeleteGuest() {
       queryClient.invalidateQueries({ queryKey: guestKeys.lists() });
     },
   });
+}
+
+// Hook to get RSVP statistics for an invitation
+export function useGuestData(invitationId: string) {
+  const { data: guests, isLoading, error } = useGuests(invitationId);
+
+  const rsvpStats = guests ? {
+    total: guests.length,
+    attending: guests.filter(g => g.rsvp_response?.status === 'attending').length,
+    notAttending: guests.filter(g => g.rsvp_response?.status === 'not_attending').length,
+    pending: guests.filter(g => !g.rsvp_response || g.rsvp_response.status === 'pending').length,
+  } : {
+    total: 0,
+    attending: 0,
+    notAttending: 0,
+    pending: 0,
+  };
+
+  return {
+    guests,
+    rsvpStats,
+    isLoading,
+    error,
+  };
 }
