@@ -1,83 +1,98 @@
-![Makerkit - Next.js Supabase SaaS Starter Kit \[Lite version\]](apps/web/public/images/makerkit.webp)
+# Invella - Digital Invitations & RSVP
 
-# NEW! Next.js Supabase SaaS Starter Kit (Lite)
+Create beautiful digital invitations and manage RSVPs effortlessly with this modern PWA web application.
 
-Start building your SaaS faster with our Next.js 15 + Supabase starter kit.
+🎉 **Perfect for any event:**
+- Weddings and engagements
+- Birthday parties and celebrations
+- Corporate events and meetings
+- Anniversaries and special occasions
 
-👉 **Looking for a full-featured SaaS Starter Kit?** [Check out the complete version](https://makerkit.dev)
-
-⭐️ **Why Developers Trust Makerkit:**
-- Production-grade architecture decisions
-- Comprehensive TypeScript setup
-- Modern stack: Next.js 15, Supabase, TailwindCSS v4
-- Quality Code tooling: ESLint v9, Prettier, strict TypeScript, etc.
-- Regular updates and active maintenance
-
-PS: the documentation for this kit is still being updated, so please check back later for more details.
+✨ **Key Features:**
+- Mobile-first PWA with offline capabilities
+- Beautiful template gallery with customization
+- Real-time RSVP tracking and guest management
+- QR codes and social media sharing
+- Anonymous guest access via secure codes
+- Professional responsive design
 
 ## What's Included
 
 ### Core Architecture
-- 🏗️ Next.js 15 + Turborepo monorepo setup
+- 🏗️ Next.js 15 + Turborepo monorepo with PWA support
 - 🎨 Shadcn UI components with TailwindCSS v4
-- 🔐 Supabase authentication & basic DB
+- 🔐 Supabase authentication & invitation database
 - 🌐 i18n translations (client + server)
 - ✨ Full TypeScript + ESLint v9 + Prettier configuration
+- 📱 Service Worker with offline capabilities
 
-### Key Features
-- 👤 User authentication flow
+### Invitation Features
+- 📧 Digital invitation creation with templates
+- 👥 Guest list management and CSV import
+- 📊 Real-time RSVP tracking and analytics
+- 🎨 Beautiful template gallery (wedding, birthday, corporate)
+- 📱 QR code generation and sharing
+- 🔗 Social media integration (WhatsApp, Facebook, Twitter)
+- 💬 Guest messaging and dietary restrictions
+- ➕ Plus-one management
+
+### Technical Features
+- 👤 User authentication and account management
 - ⚙️ User profile & settings
-- 📱 Responsive marketing pages
-- 🔒 Protected routes
-- 🎯 Basic test setup with Playwright
+- 🔒 Protected routes with RLS policies
+- 🎯 E2E test setup with Playwright
+- 🔄 Offline RSVP with background sync
+- 📲 PWA installation prompts
 
 ### Technologies
 
-This starter kit provides core foundations:
+Built with modern web technologies for optimal performance and user experience:
 
 🛠️ **Technology Stack**:
-- [Next.js 15](https://nextjs.org/): A React-based framework for server-side rendering and static site generation.
-- [Tailwind CSS](https://tailwindcss.com/): A utility-first CSS framework for rapidly building custom designs.
-- [Supabase](https://supabase.com/): A realtime database for web and mobile applications.
-- [i18next](https://www.i18next.com/): A popular internationalization framework for JavaScript.
-- [Turborepo](https://turborepo.org/): A monorepo tool for managing multiple packages and applications.
-- [Shadcn UI](https://shadcn.com/): A collection of components built using Tailwind CSS.
-- [Zod](https://github.com/colinhacks/zod): A TypeScript-first schema validation library.
-- [React Query](https://tanstack.com/query/v4): A powerful data fetching and caching library for React.
-- [Prettier](https://prettier.io/): An opinionated code formatter for JavaScript, TypeScript, and CSS.
-- [Eslint](https://eslint.org/): A powerful linting tool for JavaScript and TypeScript.
-- [Playwright](https://playwright.dev/): A framework for end-to-end testing of web applications.
+- [Next.js 15](https://nextjs.org/): React framework with App Router and PWA support
+- [Tailwind CSS v4](https://tailwindcss.com/): Utility-first CSS framework for responsive design
+- [Supabase](https://supabase.com/): Backend with authentication, database, and real-time subscriptions
+- [TypeScript](https://www.typescriptlang.org/): Type-safe development with strict configuration
+- [Turborepo](https://turborepo.org/): Monorepo management with caching and parallel execution
+- [Shadcn UI](https://shadcn.com/): Beautiful, accessible components built with Radix UI
+- [React Query](https://tanstack.com/query/v5): Data fetching, caching, and synchronization
+- [React Hook Form](https://react-hook-form.com/): Performant forms with easy validation
+- [Zod](https://github.com/colinhacks/zod): Runtime type validation and schema parsing
+- [date-fns](https://date-fns.org/): Modern date utility library
+- [Playwright](https://playwright.dev/): End-to-end testing framework
 
-This kit is a trimmed down version of the [full version of this SaaS Starter Kit](https://makerkit.dev). It is a good way to evaluate small part of the full kit, or to simply use it as a base for your own project.
+🎨 **Design Features**:
+- Responsive mobile-first design
+- Dark/light mode support
+- Beautiful animations and transitions
+- Accessible components (WCAG compliant)
+- Print-friendly QR codes
 
-## Comparing Lite vs Full Version
+## Use Cases
 
-The lite kit is perfect for:
-- Evaluating our code architecture and patterns
-- Building basic SaaS prototypes
-- Learning our tech stack approach
-- Building a basic SaaS tool
+Perfect for event organizers, wedding planners, and anyone hosting gatherings:
 
-The [full version](https://makerkit.dev) adds production features:
-- 💳 Complete billing and subscription system
-- 👥 Team accounts and management
-- 📧 Mailers and Email Templates (Nodemailer, Resend, etc.)
-- 📊 Analytics (GA, Posthog, Umami, etc.)
-- 🔦 Monitoring providers (Sentry, Baselime, etc.)
-- 🔐 Production database schema
-- ✅ Comprehensive test suite
-- 🔔 Realtime Notifications
-- 📝 Blogging system
-- 💡 Documentation system
-- ‍💻 Super Admin panel
-- 🕒 Daily updates and improvements
-- 🐛 Priority bug fixes
-- 🤝 Support
-- ⭐️ Used by 1000+ developers
-- 💪 Active community members
-- 🏢 Powers startups to enterprises
+**Personal Events:**
+- Wedding invitations with RSVP tracking
+- Birthday party planning and coordination
+- Anniversary celebrations
+- Baby showers and housewarming parties
 
-[View complete feature comparison →](https://makerkit.dev/#pricing)
+**Professional Events:**
+- Corporate meeting invitations
+- Conference and workshop registration
+- Team building events
+- Product launch parties
+
+**Features in Development:**
+- 📧 Email invitation sending
+- 📱 SMS notifications and reminders
+- 📊 Advanced analytics and insights
+- 💳 Premium template marketplace
+- 👥 Multi-user event management
+- 🔔 Real-time notification system
+- 📤 Bulk guest import improvements
+- 🎨 Custom branding options
 
 ## Getting Started
 
@@ -94,7 +109,8 @@ Please make sure you have a Docker daemon running on your machine. This is requi
 #### 1. Clone this repository
 
 ```bash
-git clone https://github.com/makerkit/next-supabase-saas-kit-lite.git
+git clone <repository-url>
+cd invella
 ```
 
 #### 2. Install dependencies
@@ -209,64 +225,104 @@ Here are the available variables:
 
 | Variable Name | Description | Default Value |
 | --- | --- | --- |
-| `NEXT_PUBLIC_SITE_URL` | The URL of your SaaS application | `http://localhost:3000` |
-| `NEXT_PUBLIC_PRODUCT_NAME` | The name of your SaaS product | `Makerkit` |
-| `NEXT_PUBLIC_SITE_TITLE` | The title of your SaaS product | `Makerkit - The easiest way to build and manage your SaaS` |
-| `NEXT_PUBLIC_SITE_DESCRIPTION` | The description of your SaaS product | `Makerkit is the easiest way to build and manage your SaaS. It provides you with the tools you need to build your SaaS, without the hassle of building it from scratch.` |
-| `NEXT_PUBLIC_DEFAULT_THEME_MODE` | The default theme mode of your SaaS product | `light` |
-| `NEXT_PUBLIC_THEME_COLOR` | The default theme color of your SaaS product | `#ffffff` |
-| `NEXT_PUBLIC_THEME_COLOR_DARK` | The default theme color of your SaaS product in dark mode | `#0a0a0a` |
+| `NEXT_PUBLIC_SITE_URL` | The URL of your invitation app | `http://localhost:3000` |
+| `NEXT_PUBLIC_PRODUCT_NAME` | The name of your app | `Invella` |
+| `NEXT_PUBLIC_SITE_TITLE` | The title of your app | `Invella - Digital Invitations & RSVP` |
+| `NEXT_PUBLIC_SITE_DESCRIPTION` | The description of your app | `Create beautiful digital invitations and manage RSVPs effortlessly` |
+| `NEXT_PUBLIC_DEFAULT_THEME_MODE` | The default theme mode | `light` |
+| `NEXT_PUBLIC_THEME_COLOR` | The default theme color | `#6366f1` |
+| `NEXT_PUBLIC_THEME_COLOR_DARK` | The theme color in dark mode | `#4f46e5` |
 | `NEXT_PUBLIC_SUPABASE_URL` | The URL of your Supabase project | `http://127.0.0.1:54321` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | The anon key of your Supabase project | ''
-| `SUPABASE_SERVICE_ROLE_KEY` | The service role key of your Supabase project | ''
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | The anon key of your Supabase project | '' |
+| `SUPABASE_SERVICE_ROLE_KEY` | The service role key of your Supabase project | '' |
 
 ## Architecture
 
-This starter kit uses a monorepo architecture.
+Invella uses a modern monorepo architecture for scalability and maintainability:
 
-1. The `apps/web` directory is the Next.js application.
-2. The `packages` directory contains all the packages used by the application.
-3. The `packages/features` directory contains all the features of the application.
-4. The `packages/ui` directory contains all the UI components.
-
-For more information about the architecture, please refer to the [Makerkit blog post about Next.js Project Structure](https://makerkit.dev/blog/tutorials/nextjs-app-router-project-structure).
-
-### Marketing Pages
-
-Marketing pages are located in the `apps/web/app/(marketing)` directory. These pages are used to showcase the features of the SaaS and provide information about the product.
-
-### Authentication
-
-Authenticated is backed by Supabase. The `apps/web/app/auth` directory contains the authentication pages, however, the logic is into its own package `@kit/auth` located in `packages/features/auth`.
-
-This package can be used across multiple applications.
-
-### Gated Pages
-
-Gated pages are located in the `apps/web/app/home` directory. Here is where you can build your SaaS pages that are gated by authentication.
-
-### Database
-
-The Supabase database is located in the `apps/web/supabase` directory. In this directory you will find the database schema, migrations, and seed data.
-
-#### Creating a new migration
-To create a new migration, run the following command:
-
-```bash
-pnpm --filter web supabase migration new --name <migration-name>
+```
+apps/
+├── web/                    # Next.js PWA application
+│   ├── app/               # App Router pages
+│   │   ├── (marketing)/   # Public pages
+│   │   ├── auth/          # Authentication
+│   │   ├── create/        # Invitation creation (planned)
+│   │   ├── invite/        # Public invitation views (planned)
+│   │   ├── dashboard/     # User dashboard (planned)
+│   │   └── offline/       # PWA offline page
+│   ├── supabase/          # Database schema & migrations
+│   ├── public/            # Static assets & PWA files
+│   └── components/        # App-specific components
+│
+├── e2e/                   # End-to-end tests
+│
+packages/
+├── features/              # Feature packages
+│   ├── invitations/       # Invitation management
+│   ├── rsvp/             # RSVP system
+│   ├── auth/             # Authentication
+│   └── accounts/         # User accounts
+├── ui/                    # Shared UI components
+├── supabase/             # Database client & types
+├── shared/               # Shared utilities
+└── i18n/                 # Internationalization
 ```
 
-This command will create a new migration file in the `apps/web/supabase/migrations` directory. 
+### Key Features & Packages
 
-#### Applying a migration
+**@kit/invitations Package:**
+- Invitation creation and management components
+- Template gallery with categorization
+- Guest list management (manual entry, CSV import)
+- Sharing functionality (QR codes, social media, direct links)
+- Real-time invitation analytics
 
-Once you have created a migration, you can apply it to the database by running the following command:
+**@kit/rsvp Package:**
+- Anonymous guest lookup by secure codes
+- RSVP forms with dietary restrictions and plus-ones
+- Public invitation viewing
+- Offline RSVP with background sync
+- Response tracking and management
 
+**Authentication & Routes:**
+- Supabase authentication with `@kit/auth`
+- Protected dashboard pages for invitation management
+- Public invitation and RSVP pages (no auth required)
+- Mobile-optimized responsive design
+
+### Database Schema
+
+The invitation database includes:
+
+**Core Tables:**
+- `invitations` - Event details, templates, and metadata
+- `guests` - Guest lists with unique access codes
+- `rsvp_responses` - Guest responses with preferences
+- `invitation_templates` - Reusable design templates
+- `accounts` - User accounts (inherited from auth system)
+
+**Key Features:**
+- Row Level Security (RLS) for data protection
+- Guest codes for secure anonymous RSVP access
+- Real-time subscriptions for live updates
+- Storage buckets for invitation images
+
+#### Database Commands
+
+Create a new migration:
+```bash
+pnpm --filter web supabase migration new <migration-name>
+```
+
+Apply migrations and reset database:
 ```bash
 pnpm run supabase:web:reset
 ```
 
-This command will apply the migration to the database and update the schema. It will also reset the database using the provided seed data.
+Generate TypeScript types:
+```bash
+pnpm run supabase:web:typegen
+```
 
 #### Linking the Supabase database
 
@@ -328,16 +384,48 @@ export const runtime = 'edge';
 
 Remember to enable Node.js compatibility in the Cloudflare dashboard.
 
+## Development Status
+
+**✅ Completed Features:**
+- PWA configuration with offline support
+- Complete database schema with RLS policies
+- Invitation and RSVP feature packages
+- Mobile-first UI components
+- Template system with gallery
+- QR code and social sharing
+- Guest code system for anonymous access
+
+**🚧 In Development:**
+- Web pages for invitation creation
+- Public invitation and RSVP views
+- Dashboard and analytics pages
+- Email and SMS notifications
+
 ## Contributing
 
-Contributions for bug fixed are welcome! However, please open an issue first to discuss your ideas before making a pull request.
+Contributions are welcome! Please open an issue first to discuss your ideas before making a pull request.
+
+### Development Workflow
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes following existing patterns
+4. Run tests: `pnpm run test`
+5. Submit a pull request
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-## Support
+## Roadmap
 
-No support is provided for this kit. Feel free to open an issue if you have any questions or need help, but there is no guaranteed response time, nor guarantee a fix.
+**Short Term:**
+- Complete web page implementation
+- Email invitation delivery
+- Advanced template customization
+- Mobile app (React Native)
 
-For dedicated support, priority fixes, and advanced features, [check out our full version](https://makerkit.dev).
+**Long Term:**
+- Multi-language support
+- Premium template marketplace
+- Event analytics dashboard
+- Integration with calendar apps
