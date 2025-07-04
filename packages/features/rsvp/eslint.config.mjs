@@ -1,5 +1,3 @@
-import { kitConfig } from '@kit/eslint-config/apps';
-
-const config = kitConfig;
+import config from '../../../tooling/eslint/apps.js';
 
 export default config;

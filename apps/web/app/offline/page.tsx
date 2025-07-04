@@ -10,14 +10,14 @@ export default function OfflinePage() {
           <div className="flex justify-center mb-4">
             <WifiOff className="h-16 w-16 text-muted-foreground" />
           </div>
-          <CardTitle>You're Offline</CardTitle>
+          <CardTitle>You&apos;re Offline</CardTitle>
           <CardDescription>
-            It looks like you've lost your internet connection. Don't worry, you can still view your cached invitations.
+            It looks like you&apos;ve lost your internet connection. Don&apos;t worry, you can still view your cached invitations.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Any RSVP responses you submit while offline will be automatically synced when you're back online.
+            Any RSVP responses you submit while offline will be automatically synced when you&apos;re back online.
           </p>
           <Button 
             onClick={() => window.location.reload()} 

@@ -156,11 +156,11 @@ export default function RSVPPage({ params }: RSVPPageProps) {
                     >
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="attending" id="attending" />
-                        <Label htmlFor="attending">Yes, I'll be there!</Label>
+                        <Label htmlFor="attending">Yes, I&apos;ll be there!</Label>
                       </div>
                       <div className="flex items-center space-x-2">
                         <RadioGroupItem value="not_attending" id="not_attending" />
-                        <Label htmlFor="not_attending">Sorry, I can't make it</Label>
+                        <Label htmlFor="not_attending">Sorry, I can&apos;t make it</Label>
                       </div>
                     </RadioGroup>
                   </div>

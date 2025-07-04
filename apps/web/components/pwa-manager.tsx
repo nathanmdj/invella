@@ -2,6 +2,11 @@
 
 import { useEffect } from 'react';
 
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
 export function PWAManager() {
   useEffect(() => {
     // Register service worker
@@ -31,13 +36,13 @@ export function PWAManager() {
     }
 
     // Handle app install prompt
-    let deferredPrompt: any;
+    let _deferredPrompt: BeforeInstallPromptEvent | null = null;
     
     const handleBeforeInstallPrompt = (e: Event) => {
       // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
       // Stash the event so it can be triggered later
-      deferredPrompt = e;
+      _deferredPrompt = e as BeforeInstallPromptEvent;
       
       // Show install button/banner
       console.log('PWA install prompt available');

@@ -1,4 +1,3 @@
-import { redirect } from 'next/navigation';
 
 import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
 
