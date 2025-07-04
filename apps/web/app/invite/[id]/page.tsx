@@ -9,6 +9,9 @@ import { Skeleton } from '@kit/ui/skeleton';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { usePublicInvitation } from '@kit/invitations/hooks/use-invitation-data';
+import { TemplateRenderer } from '@kit/ui/template-renderer';
+import { InvitationFrames, getDefaultFrames } from '@kit/ui/invitation-frames';
+import { useRouter } from 'next/navigation';
 
 interface InvitationPageProps {
   params: {
@@ -18,7 +21,25 @@ interface InvitationPageProps {
 
 export default function InvitationPage({ params }: InvitationPageProps) {
   const invitationId = params.id;
+  const router = useRouter();
   const { data: invitation, isLoading, error } = usePublicInvitation(invitationId);
+
+  // Mock template data for now - in production this would come from the database
+  const mockTemplate = {
+    id: 'template-1',
+    name: 'Classic Wedding',
+    category: invitation?.template_id ? 'wedding' : 'general',
+    design_config: {
+      primaryColor: '#3b82f6',
+      accentColor: '#f59e0b',
+      fontFamily: 'serif',
+      layout: 'classic'
+    }
+  };
+
+  const handleRSVPClick = () => {
+    router.push(`/invite/${invitationId}/rsvp`);
+  };
 
   if (error) {
     return (
@@ -59,71 +80,54 @@ export default function InvitationPage({ params }: InvitationPageProps) {
     );
   }
 
+  // Get frames based on template category
+  const frames = getDefaultFrames(mockTemplate.category);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
-      <div className="container mx-auto px-4 py-8 max-w-2xl">
-        {/* Invitation Card */}
-        <div className="mb-8">
-          <InvitationCard invitation={invitation} />
+    <div className="min-h-screen w-full">
+             <TemplateRenderer 
+         template={mockTemplate}
+         invitation={{
+           id: invitation.id,
+           title: invitation.title,
+           description: invitation.description || undefined,
+           event_date: invitation.event_date || '',
+           location: invitation.location || undefined,
+           image_url: invitation.image_url || undefined,
+         }}
+         className="w-full h-full"
+       >
+        {/* Full-Screen Template Gallery Frames */}
+                 <InvitationFrames
+           invitation={{
+             ...invitation,
+             description: invitation.description || null,
+             event_date: invitation.event_date || null,
+             location: invitation.location || null,
+             image_url: invitation.image_url || null,
+             updated_by: invitation.updated_by || null,
+             template_id: invitation.template_id || null,
+             max_guests: invitation.max_guests || null,
+             rsvp_deadline: invitation.rsvp_deadline || null,
+           }}
+          template={mockTemplate}
+          frames={frames}
+          onRSVPClick={handleRSVPClick}
+          className="w-full"
+        />
+
+        {/* Share Section - Fixed at bottom of last frame */}
+        <div className="fixed bottom-4 left-4 right-4 z-20">
+          <Card className="max-w-sm mx-auto bg-white/90 backdrop-blur-sm border-0 shadow-lg">
+            <CardContent className="p-4">
+              <ShareInvitation 
+                invitationId={invitationId} 
+                invitationTitle={invitation.title}
+              />
+            </CardContent>
+          </Card>
         </div>
-
-        {/* Event Details */}
-        <Card className="mb-8">
-          <CardContent className="p-6">
-            <div className="space-y-4">
-              {invitation.event_date && (
-                <div className="flex items-start gap-3">
-                  <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="font-medium">Date & Time</p>
-                    <p className="text-sm text-muted-foreground">
-                      {format(new Date(invitation.event_date), 'PPP')} at {format(new Date(invitation.event_date), 'p')}
-                    </p>
-                  </div>
-                </div>
-              )}
-              
-              {invitation.location && (
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="font-medium">Location</p>
-                    <p className="text-sm text-muted-foreground">
-                      {invitation.location}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* RSVP Button */}
-        <div className="flex flex-col gap-4 mb-8">
-          <Button asChild size="lg" className="w-full">
-            <Link href={`/invite/${invitationId}/rsvp`}>
-              RSVP Now
-            </Link>
-          </Button>
-          
-          {invitation.rsvp_deadline && (
-            <p className="text-sm text-center text-muted-foreground">
-              Please respond by {format(new Date(invitation.rsvp_deadline), 'PPP')}
-            </p>
-          )}
-        </div>
-
-        {/* Share Invitation */}
-        <Card>
-          <CardContent className="p-6">
-            <h3 className="font-semibold mb-4">Share This Invitation</h3>
-            <ShareInvitation 
-              invitationId={invitationId} 
-              invitationTitle={invitation.title}
-            />
-          </CardContent>
-        </Card>
-      </div>
+      </TemplateRenderer>
     </div>
   );
 }
