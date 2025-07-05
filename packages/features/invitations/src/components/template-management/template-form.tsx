@@ -59,8 +59,14 @@ export function TemplateForm({ templateId }: TemplateFormProps) {
       is_public: false,
       preview_image: '',
       design_config: {
-        primaryColor: '#ffffff',
-        accentColor: '#000000',
+        primaryColor: '#3b82f6',
+        accentColor: '#f59e0b',
+        backgroundColor: '#ffffff',
+        surfaceColor: '#f8fafc',
+        textColor: '#1f2937',
+        textSecondaryColor: '#6b7280',
+        borderColor: '#e5e7eb',
+        overlayColor: 'rgba(0, 0, 0, 0.5)',
         fontFamily: 'sans-serif',
         layout: 'default',
       },
@@ -77,8 +83,14 @@ export function TemplateForm({ templateId }: TemplateFormProps) {
         is_public: existingTemplate.is_public,
         preview_image: existingTemplate.preview_image || '',
         design_config: {
-          primaryColor: existingTemplate.design_config.primaryColor || '#ffffff',
-          accentColor: existingTemplate.design_config.accentColor || '#000000',
+          primaryColor: existingTemplate.design_config.primaryColor || '#3b82f6',
+          accentColor: existingTemplate.design_config.accentColor || '#f59e0b',
+          backgroundColor: existingTemplate.design_config.backgroundColor || '#ffffff',
+          surfaceColor: existingTemplate.design_config.surfaceColor || '#f8fafc',
+          textColor: existingTemplate.design_config.textColor || '#1f2937',
+          textSecondaryColor: existingTemplate.design_config.textSecondaryColor || '#6b7280',
+          borderColor: existingTemplate.design_config.borderColor || '#e5e7eb',
+          overlayColor: existingTemplate.design_config.overlayColor || 'rgba(0, 0, 0, 0.5)',
           fontFamily: existingTemplate.design_config.fontFamily || 'sans-serif',
           layout: existingTemplate.design_config.layout || 'default',
           ...existingTemplate.design_config,
@@ -266,13 +278,151 @@ export function TemplateForm({ templateId }: TemplateFormProps) {
                     <FormLabel>Accent Color</FormLabel>
                     <div className="flex items-center space-x-2">
                       <FormControl>
-                        <Input {...field} placeholder="#000000" />
+                        <Input {...field} placeholder="#f59e0b" />
                       </FormControl>
                       <div 
                         className="w-10 h-10 rounded border border-gray-200"
                         style={{ backgroundColor: field.value }}
                       />
                     </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="design_config.backgroundColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Background Color</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <FormControl>
+                        <Input {...field} placeholder="#ffffff" />
+                      </FormControl>
+                      <div 
+                        className="w-10 h-10 rounded border border-gray-200"
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                    <FormDescription>
+                      Main background color for the invitation
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="design_config.surfaceColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Surface Color</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <FormControl>
+                        <Input {...field} placeholder="#f8fafc" />
+                      </FormControl>
+                      <div 
+                        className="w-10 h-10 rounded border border-gray-200"
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                    <FormDescription>
+                      Color for cards and elevated surfaces
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="design_config.textColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Text Color</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <FormControl>
+                        <Input {...field} placeholder="#1f2937" />
+                      </FormControl>
+                      <div 
+                        className="w-10 h-10 rounded border border-gray-200"
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                    <FormDescription>
+                      Primary text color
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="design_config.textSecondaryColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Secondary Text Color</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <FormControl>
+                        <Input {...field} placeholder="#6b7280" />
+                      </FormControl>
+                      <div 
+                        className="w-10 h-10 rounded border border-gray-200"
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                    <FormDescription>
+                      Secondary text and subtitle color
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="design_config.borderColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Border Color</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <FormControl>
+                        <Input {...field} placeholder="#e5e7eb" />
+                      </FormControl>
+                      <div 
+                        className="w-10 h-10 rounded border border-gray-200"
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                    <FormDescription>
+                      Color for borders and dividers
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="design_config.overlayColor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Overlay Color</FormLabel>
+                    <div className="flex items-center space-x-2">
+                      <FormControl>
+                        <Input {...field} placeholder="rgba(0, 0, 0, 0.5)" />
+                      </FormControl>
+                      <div 
+                        className="w-10 h-10 rounded border border-gray-200"
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                    <FormDescription>
+                      Color for overlays and modal backgrounds
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
