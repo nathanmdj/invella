@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { cn } from '../lib/utils';
 import type { Database } from '@kit/supabase/database';
 
@@ -40,7 +41,7 @@ export function TemplateRenderer({
   } as React.CSSProperties;
 
   const templateClasses = cn(
-    'template-renderer',
+    'template-renderer w-full h-full overflow-hidden',
     `template-${template.category}`,
     `layout-${config?.layout || 'classic'}`,
     config?.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
@@ -48,53 +49,81 @@ export function TemplateRenderer({
   );
 
   return (
-    <div 
+    <motion.div 
       className={templateClasses}
       style={templateStyles}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, ease: 'easeOut' }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
 // Template-specific layout components
 export function ClassicTemplate({ children }: { children: React.ReactNode }) {
   return (
-    <div className="classic-template space-y-8">
+    <motion.div 
+      className="classic-template space-y-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' as const }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
 export function ModernTemplate({ children }: { children: React.ReactNode }) {
   return (
-    <div className="modern-template space-y-6">
+    <motion.div 
+      className="modern-template space-y-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' as const }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
 export function MinimalTemplate({ children }: { children: React.ReactNode }) {
   return (
-    <div className="minimal-template space-y-4">
+    <motion.div 
+      className="minimal-template space-y-4"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' as const }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
 export function GardenTemplate({ children }: { children: React.ReactNode }) {
   return (
-    <div className="garden-template space-y-6">
+    <motion.div 
+      className="garden-template space-y-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' as const }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
 export function LuxuryTemplate({ children }: { children: React.ReactNode }) {
   return (
-    <div className="luxury-template space-y-8">
+    <motion.div 
+      className="luxury-template space-y-8"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, ease: 'easeOut' as const }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
 
