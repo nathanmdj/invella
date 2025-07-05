@@ -7,6 +7,12 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+interface ServiceWorkerRegistrationWithSync extends ServiceWorkerRegistration {
+  sync: {
+    register: (tag: string) => Promise<void>;
+  };
+}
+
 export function PWAManager() {
   useEffect(() => {
     // Register service worker
@@ -51,7 +57,7 @@ export function PWAManager() {
 
     const handleAppInstalled = () => {
       console.log('PWA was installed');
-      deferredPrompt = null;
+      _deferredPrompt = null;
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -69,7 +75,7 @@ export function PWAManager() {
     if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
       navigator.serviceWorker.ready.then((registration) => {
         // Register for background sync
-        return registration.sync.register('rsvp-sync');
+        return (registration as ServiceWorkerRegistrationWithSync).sync.register('rsvp-sync');
       }).catch((error) => {
         console.error('Background sync registration failed:', error);
       });
