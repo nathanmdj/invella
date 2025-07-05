@@ -2,10 +2,22 @@ import { z } from 'zod';
 
 // Schema for template design configuration
 export const TemplateDesignConfigSchema = z.object({
+  // Core brand colors
   primaryColor: z.string().optional(),
   accentColor: z.string().optional(),
+  
+  // Comprehensive color palette for UI elements
+  backgroundColor: z.string().optional(),      // Main background color
+  surfaceColor: z.string().optional(),        // Card/surface background
+  textColor: z.string().optional(),           // Primary text color
+  textSecondaryColor: z.string().optional(),  // Secondary text color
+  borderColor: z.string().optional(),         // Border and divider colors
+  overlayColor: z.string().optional(),        // Overlay backgrounds
+  
+  // Typography and layout
   fontFamily: z.string().optional(),
   layout: z.string().optional(),
+  
   // Allow any additional configuration
 }).catchall(z.any());
 
