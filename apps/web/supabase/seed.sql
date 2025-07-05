@@ -139,3 +139,66 @@ VALUES
 
 -- Note: Since we're using UUIDs, no sequence update is needed
 -- The templates above provide a good starting collection for users
+
+-- Insert test user
+-- First insert into auth.users (using INSERT ... ON CONFLICT DO NOTHING)
+INSERT INTO auth.users (
+  id,
+  instance_id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  recovery_sent_at,
+  last_sign_in_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at,
+  confirmation_token,
+  email_change,
+  email_change_token_new,
+  recovery_token
+) VALUES (
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000000',
+  'authenticated',
+  'authenticated',
+  'test@example.com',
+  '$2a$10$NaMVRrI7NyfwP.AfAVWt6O/abulGnf9BBqwa6DqdMwXMvOCGpAnVO', -- password: "password123"
+  now(),
+  now(),
+  now(),
+  '{"provider": "email", "providers": ["email"]}',
+  '{"name": "Test User", "email": "test@example.com"}',
+  now(),
+  now(),
+  '',
+  '',
+  '',
+  ''
+) ON CONFLICT (id) DO NOTHING;
+
+-- Insert corresponding account record (using INSERT ... ON CONFLICT DO NOTHING)
+INSERT INTO public.accounts (
+  id,
+  name,
+  email,
+  picture_url,
+  created_at,
+  updated_at,
+  created_by,
+  updated_by,
+  public_data
+) VALUES (
+  '00000000-0000-0000-0000-000000000001',
+  'Test User',
+  'test@example.com',
+  null,
+  now(),
+  now(),
+  '00000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000001',
+  '{}'::jsonb
+) ON CONFLICT (id) DO NOTHING;
