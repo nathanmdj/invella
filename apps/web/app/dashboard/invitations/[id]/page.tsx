@@ -1,9 +1,7 @@
-'use client';
-
-import { useParams } from 'next/navigation';
 import { InvitationCard } from '@kit/invitations/invitation-card';
 import { GuestList } from '@kit/invitations/guest-list';
 import { ShareInvitation } from '@kit/invitations/share-invitation';
+import { getUserInvitation, getGuestData } from '@kit/invitations/server/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Button } from '@kit/ui/button';
 import { 
@@ -13,32 +11,25 @@ import {
   Clock,
 } from 'lucide-react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-export default function InvitationDetailsPage() {
-  const params = useParams();
-  const invitationId = params.id as string;
+interface InvitationDetailsPageProps {
+  params: { id: string };
+}
 
-  // Mock data - in real app, this would come from useInvitationData hook
-  const invitation = {
-    id: invitationId,
-    title: "Sarah & John's Wedding",
-    description: "Join us for our special day as we celebrate our love and commitment to each other.",
-    event_date: "2024-08-15T16:00:00Z",
-    location: "Garden Rose Venue, 123 Wedding Lane, San Francisco, CA",
-    image_url: "/images/wedding-template.jpg",
-    template_id: "elegant-wedding",
-    rsvp_deadline: "2024-08-01T23:59:59Z",
-    is_public: true,
-    max_guests: 100,
-  };
+export default async function InvitationDetailsPage({ params }: InvitationDetailsPageProps) {
+  const invitationId = params.id;
 
-  // Mock RSVP stats
-  const rsvpStats = {
-    total: 85,
-    attending: 68,
-    notAttending: 12,
-    pending: 5,
-  };
+  const [invitation, guestData] = await Promise.all([
+    getUserInvitation(invitationId),
+    getGuestData(invitationId)
+  ]);
+
+  if (!invitation) {
+    notFound();
+  }
+
+  const { rsvpStats } = guestData;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -168,7 +159,13 @@ export default function InvitationDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="scale-75 origin-top">
-                <InvitationCard invitation={invitation} />
+                <InvitationCard invitation={{
+                  ...invitation,
+                  guest_count: rsvpStats.total,
+                  rsvp_count: rsvpStats.attending + rsvpStats.notAttending,
+                  attending_count: rsvpStats.attending,
+                  not_attending_count: rsvpStats.notAttending,
+                }} />
               </div>
             </CardContent>
           </Card>
@@ -181,7 +178,7 @@ export default function InvitationDetailsPage() {
             <CardContent>
               <ShareInvitation 
                 invitationId={invitationId} 
-                title={invitation.title}
+                invitationTitle={invitation.title}
               />
             </CardContent>
           </Card>
