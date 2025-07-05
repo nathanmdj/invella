@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { Button } from '../shadcn/button';
 import { Badge } from '../shadcn/badge';
@@ -38,226 +39,169 @@ export function InvitationFrames({
   className 
 }: InvitationFramesProps) {
   const [currentFrame, setCurrentFrame] = useState(0);
-  const [isIntersecting, setIsIntersecting] = useState<boolean[]>(new Array(frames.length).fill(false));
-  const [scrollY, setScrollY] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState<number[]>(new Array(frames.length).fill(0));
-  const frameRefs = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  // Framer Motion scroll tracking
+  const { scrollY } = useScroll({ container: containerRef });
+  const springScrollY = useSpring(scrollY, { stiffness: 100, damping: 30 });
 
-  // Handle scroll for progressive transitions
+  // Smooth scroll to frame with Framer Motion
+  const scrollToFrame = useCallback((index: number) => {
+    if (containerRef.current) {
+      const frameHeight = window.innerHeight;
+      const targetY = index * frameHeight;
+      
+      // Smooth scroll with requestAnimationFrame
+      const startScrollTop = containerRef.current.scrollTop;
+      const distance = targetY - startScrollTop;
+      const duration = 1200; // 1.2 seconds
+      const startTime = performance.now();
+      
+      const animateScroll = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Ease out function
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        
+        if (containerRef.current) {
+          containerRef.current.scrollTop = startScrollTop + distance * easeOut;
+        }
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateScroll);
+        }
+      };
+      
+      requestAnimationFrame(animateScroll);
+      
+      setCurrentFrame(index);
+    }
+  }, []);
+
+  // Update current frame based on scroll position
   const handleScroll = useCallback(() => {
     if (containerRef.current) {
       const scrollTop = containerRef.current.scrollTop;
-      setScrollY(scrollTop);
+      const frameHeight = window.innerHeight;
+      const newCurrentFrame = Math.round(scrollTop / frameHeight);
       
-      // Calculate progress for each frame
-      const newProgress = frames.map((_, index) => {
-        const frameElement = frameRefs.current[index];
-        if (!frameElement) return 0;
-        
-        const frameTop = frameElement.offsetTop;
-        const frameHeight = frameElement.offsetHeight;
-        const viewportHeight = window.innerHeight;
-        
-        // Calculate how much of the frame is visible
-        const frameBottom = frameTop + frameHeight;
-        const viewportBottom = scrollTop + viewportHeight;
-        
-        if (scrollTop >= frameBottom) {
-          // Frame is completely above viewport
-          return 0;
-        } else if (viewportBottom <= frameTop) {
-          // Frame is completely below viewport
-          return 0;
-        } else {
-          // Frame is partially or fully visible
-          const visibleTop = Math.max(scrollTop, frameTop);
-          const visibleBottom = Math.min(viewportBottom, frameBottom);
-          const visibleHeight = visibleBottom - visibleTop;
-          const progress = Math.min(visibleHeight / viewportHeight, 1);
-          return Math.max(0, progress);
-        }
-      });
-      
-      setScrollProgress(newProgress);
-      
-      // Update current frame based on which has highest progress
-      const maxProgressIndex = newProgress.indexOf(Math.max(...newProgress));
-      if (maxProgressIndex !== -1 && newProgress[maxProgressIndex] > 0.3) {
-        setCurrentFrame(maxProgressIndex);
+      if (newCurrentFrame !== currentFrame && newCurrentFrame >= 0 && newCurrentFrame < frames.length) {
+        setCurrentFrame(newCurrentFrame);
       }
     }
-  }, [frames.length]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener('scroll', handleScroll, { passive: true });
-      return () => container.removeEventListener('scroll', handleScroll);
-    }
-  }, [handleScroll]);
-
-  // Intersection Observer for scroll-triggered animations
-  useEffect(() => {
-    const observers: IntersectionObserver[] = [];
-    
-    frameRefs.current.forEach((ref, index) => {
-      if (ref) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              const ratio = entry.intersectionRatio;
-              
-              setIsIntersecting(prev => {
-                const newState = [...prev];
-                newState[index] = ratio > 0.1;
-                return newState;
-              });
-            });
-          },
-          { 
-            threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0],
-            rootMargin: '0px 0px 0px 0px'
-          }
-        );
-        
-        observer.observe(ref);
-        observers.push(observer);
-      }
-    });
-
-    return () => {
-      observers.forEach(observer => observer.disconnect());
-    };
-  }, [frames.length]);
-
-  const scrollToFrame = (index: number) => {
-    if (frameRefs.current[index]) {
-      const targetElement = frameRefs.current[index];
-      if (targetElement) {
-        const container = targetElement.closest('.invitation-frames');
-        if (container) {
-          const targetTop = targetElement.offsetTop;
-          
-          // Enhanced smooth scrolling with custom easing
-          const startTime = performance.now();
-          const startScrollTop = container.scrollTop;
-          const distance = targetTop - startScrollTop;
-          const duration = 4000; // Ultra-long duration for very slow, smooth snapping
-          
-          const easeInOutQuint = (t: number): number => {
-            return t < 0.5 ? 16 * t * t * t * t * t : 1 - Math.pow(-2 * t + 2, 5) / 2;
-          };
-          
-          const animateScroll = (currentTime: number) => {
-            const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const easedProgress = easeInOutQuint(progress);
-            
-            container.scrollTo({
-              top: startScrollTop + distance * easedProgress,
-              behavior: 'auto' // Use auto to avoid conflicts with CSS smooth scroll
-            });
-            
-            if (progress < 1) {
-              requestAnimationFrame(animateScroll);
-            }
-          };
-          
-          requestAnimationFrame(animateScroll);
-        } else {
-          // Fallback to standard scrollIntoView
-          targetElement.scrollIntoView({ 
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      }
-    }
-  };
+  }, [currentFrame, frames.length]);
 
   return (
-    <div 
+    <motion.div 
       ref={containerRef}
-      className={cn('invitation-frames relative w-full h-screen overflow-y-auto scroll-smooth-enhanced', className)} 
+      className={cn('invitation-frames relative w-full h-screen overflow-y-auto overflow-x-hidden', className)}
       style={{ 
-        scrollBehavior: 'smooth',
         height: '100vh',
         maxHeight: '100vh',
-        scrollSnapType: 'y mandatory'
+        scrollSnapType: 'y mandatory',
+        scrollBehavior: 'smooth'
       }}
+      onScroll={handleScroll}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8, ease: 'easeOut' }}
     >
-      {/* Full-Screen Frame Container */}
+      {/* Frame Container */}
       <div className="w-full">
         {frames.map((frame, index) => (
-          <div 
+          <motion.div 
             key={frame.id}
-            ref={(el) => { frameRefs.current[index] = el; }}
-            className="min-h-screen w-full relative isolate"
+            className="min-h-screen w-full relative overflow-hidden"
             style={{ 
-              zIndex: frames.length - index, // Higher z-index for frames that come first
-              height: '100vh', // Ensure exact viewport height
+              height: '100vh',
               minHeight: '100vh',
               scrollSnapAlign: 'start',
               scrollSnapStop: 'always'
+            }}
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.8, 
+              delay: index * 0.1,
+              ease: 'easeOut' as const
             }}
           >
             <InvitationFrame 
               frame={frame}
               invitation={invitation}
               template={template}
-              isActive={isIntersecting[index] || false}
-              scrollProgress={scrollProgress[index] || 0}
+              index={index}
+              isActive={currentFrame === index}
               onRSVPClick={onRSVPClick}
             />
-          </div>
+          </motion.div>
         ))}
       </div>
 
-      {/* Navigation Dots - Fixed Position */}
-      {frames.length > 1 && (
-        <div className="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col space-y-4 z-10">
-          {frames.map((frame, index) => (
-            <button
-              key={frame.id}
-              onClick={() => scrollToFrame(index)}
-              className={cn(
-                'relative w-4 h-4 rounded-full transition-all duration-1000 ease-out group',
-                'hover:scale-110 focus:outline-none focus:ring-2 focus:ring-white/50',
-                index === currentFrame 
-                  ? 'bg-[var(--template-primary)] scale-125 shadow-lg shadow-[var(--template-primary)]/30' 
-                  : 'bg-white/50 hover:bg-white/70 backdrop-blur-sm'
-              )}
-              aria-label={`Go to frame ${index + 1}: ${frame.title}`}
-            >
-              {/* Active indicator ring */}
-              {index === currentFrame && (
-                <div 
-                  className="absolute inset-0 rounded-full border-2 border-white/70 scale-150 animate-pulse"
-                  style={{ borderColor: 'var(--template-primary)' }}
-                />
-              )}
-              
-              {/* Tooltip */}
-              <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 px-2 py-1 bg-black/80 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none">
-                {frame.title || `Frame ${index + 1}`}
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
+      {/* Enhanced Navigation Dots */}
+      <AnimatePresence>
+        {frames.length > 1 && (
+          <motion.div 
+            className="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col space-y-3 z-50"
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            {frames.map((frame, index) => (
+              <motion.button
+                key={frame.id}
+                onClick={() => scrollToFrame(index)}
+                className={cn(
+                  'relative w-3 h-3 rounded-full focus:outline-none focus:ring-2 focus:ring-white/50 group',
+                  'backdrop-blur-sm border border-white/20',
+                  index === currentFrame 
+                    ? 'bg-white shadow-lg' 
+                    : 'bg-white/30 hover:bg-white/50'
+                )}
+                whileHover={{ scale: 1.3 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                aria-label={`Go to frame ${index + 1}: ${frame.title}`}
+              >
+                {/* Active indicator */}
+                <AnimatePresence>
+                  {index === currentFrame && (
+                    <motion.div 
+                      className="absolute inset-0 rounded-full"
+                      style={{ 
+                        background: 'var(--template-primary)',
+                        boxShadow: '0 0 20px var(--template-primary)50'
+                      }}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                    />
+                  )}
+                </AnimatePresence>
+                
+                {/* Tooltip */}
+                <motion.div 
+                  className="absolute right-full mr-4 top-1/2 -translate-y-1/2 px-3 py-1 bg-black/90 text-white text-xs rounded-lg whitespace-nowrap pointer-events-none backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-30 min-w-max"
+                >
+                  {frame.title || `Frame ${index + 1}`}
+                </motion.div>
+              </motion.button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Scroll Indicator - Simple Down Arrow */}
+      {/* Scroll Indicator - Simplified */}
       {frames.length > 1 && currentFrame < frames.length - 1 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-10">
-          <div className="animate-bounce">
-            <div className="bg-white/80 backdrop-blur-sm rounded-full p-3 shadow-lg hover:bg-white/90 transition-colors duration-200">
-              <ChevronRight className="w-5 h-5 text-gray-600 rotate-90" />
-            </div>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 opacity-60 hover:opacity-100 transition-opacity duration-300">
+          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 border border-white/30 animate-bounce">
+            <ChevronRight className="w-5 h-5 text-white rotate-90" />
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -270,8 +214,8 @@ interface InvitationFrameProps {
     category: string;
     design_config: any;
   };
+  index: number;
   isActive: boolean;
-  scrollProgress: number;
   onRSVPClick?: () => void;
 }
 
@@ -279,66 +223,109 @@ function InvitationFrame({
   frame, 
   invitation, 
   template, 
+  index,
   isActive,
-  scrollProgress,
   onRSVPClick 
 }: InvitationFrameProps) {
-  // Calculate smooth opacity and transform based on scroll progress
-  const opacity = Math.min(scrollProgress * 1.2, 1); // Slightly faster opacity change
-  const translateY = (1 - scrollProgress) * 20; // Gentler slide up
-  const scale = 0.98 + (scrollProgress * 0.02); // Subtler scale transition
-  
-  const frameStyle = {
-    opacity,
-    transform: `translateY(${translateY}px) scale(${scale})`,
-    transition: 'transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1)' // Slower, smoother transitions
+  const ref = useRef<HTMLDivElement>(null);
+  const isInView = useInView(ref, { amount: 0.3 });
+
+  const frameVariants = {
+    hidden: { opacity: 0, y: 60, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        ease: 'easeOut' as const,
+        staggerChildren: 0.1,
+        delayChildren: 0.2
+      }
+    }
   };
-  
-  const animationClasses = cn(
-    'relative isolate w-full h-full min-h-screen'
-  );
+
+  const childVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: 'easeOut' as const
+      }
+    }
+  };
 
   switch (frame.type) {
     case 'hero':
       return (
-        <div style={frameStyle} className={animationClasses}>
+        <motion.div 
+          ref={ref}
+          className="relative isolate w-full h-full min-h-screen"
+          variants={frameVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
           <HeroFrame 
             invitation={invitation}
             template={template}
+            childVariants={childVariants}
             className="w-full h-full"
           />
-        </div>
+        </motion.div>
       );
     case 'details':
       return (
-        <div style={frameStyle} className={animationClasses}>
+        <motion.div 
+          ref={ref}
+          className="relative isolate w-full h-full min-h-screen"
+          variants={frameVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
           <DetailsFrame 
             invitation={invitation}
             template={template}
+            childVariants={childVariants}
             className="w-full h-full"
           />
-        </div>
+        </motion.div>
       );
     case 'rsvp':
       return (
-        <div style={frameStyle} className={animationClasses}>
+        <motion.div 
+          ref={ref}
+          className="relative isolate w-full h-full min-h-screen"
+          variants={frameVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
           <RSVPFrame 
             invitation={invitation}
             template={template}
+            childVariants={childVariants}
             onRSVPClick={onRSVPClick}
             className="w-full h-full"
           />
-        </div>
+        </motion.div>
       );
     case 'gallery':
       return (
-        <div style={frameStyle} className={animationClasses}>
+        <motion.div 
+          ref={ref}
+          className="relative isolate w-full h-full min-h-screen"
+          variants={frameVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
           <GalleryFrame 
             invitation={invitation}
             template={template}
+            childVariants={childVariants}
             className="w-full h-full"
           />
-        </div>
+        </motion.div>
       );
     default:
       return null;
@@ -360,10 +347,16 @@ function getDefaultBackground(category: string, primaryColor: string, accentColo
   return backgrounds[category as keyof typeof backgrounds] || backgrounds.other;
 }
 
-// Individual Frame Components
-function HeroFrame({ invitation, template, className }: { 
+// Individual Frame Components with Framer Motion
+function HeroFrame({ 
+  invitation, 
+  template, 
+  childVariants,
+  className 
+}: { 
   invitation: Invitation; 
   template: any; 
+  childVariants: any;
   className?: string;
 }) {
   const defaultBackground = getDefaultBackground(
@@ -374,75 +367,123 @@ function HeroFrame({ invitation, template, className }: {
 
   return (
     <div className={cn('hero-frame min-h-screen w-full flex items-center justify-center relative overflow-hidden isolate bg-white', className)}>
-      {/* Default Background */}
-      <div 
+      {/* Animated Background */}
+      <motion.div 
         className="absolute inset-0"
-        style={{
-          background: defaultBackground
-        }}
+        style={{ background: defaultBackground }}
+        initial={{ opacity: 0, scale: 1.1 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
       />
       
-      {/* Background Image if available */}
-      {invitation.image_url && (
-        <div className="absolute inset-0">
-          <img 
-            src={invitation.image_url} 
-            alt=""
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40" />
-        </div>
-      )}
-      
-      {/* Enhanced text visibility overlay when no image */}
-      {!invitation.image_url && (
-        <div className="absolute inset-0 bg-gradient-to-br from-black/5 via-transparent to-black/10" />
-      )}
+      {/* Background Image with parallax */}
+      <AnimatePresence>
+        {invitation.image_url && (
+          <motion.div 
+            className="absolute inset-0"
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, ease: 'easeOut' }}
+          >
+            <img 
+              src={invitation.image_url} 
+              alt=""
+              className="w-full h-full object-cover"
+            />
+            <motion.div 
+              className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <div className="space-y-8">
-          <Badge 
-            variant="outline" 
-            className={cn(
-              "text-sm px-6 py-2 border-0 shadow-lg",
-              invitation.image_url ? "bg-white/80 backdrop-blur-sm" : "bg-white/90"
-            )}
-            style={{ color: 'var(--template-primary)' }}
-          >
-            {template.category.charAt(0).toUpperCase() + template.category.slice(1).replace('_', ' ')}
-          </Badge>
+      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
+        <motion.div className="space-y-8" variants={childVariants}>
+          <motion.div variants={childVariants}>
+            <Badge 
+              variant="outline" 
+              className={cn(
+                "text-sm px-6 py-2 border-0 shadow-lg backdrop-blur-sm",
+                invitation.image_url ? "bg-white/80" : "bg-white/90"
+              )}
+              style={{ color: 'var(--template-primary)' }}
+            >
+              {template.category.charAt(0).toUpperCase() + template.category.slice(1).replace('_', ' ')}
+            </Badge>
+          </motion.div>
           
-          <h1 
+          <motion.h1 
             className={cn(
-              "text-5xl md:text-7xl lg:text-8xl font-bold leading-tight drop-shadow-2xl",
-              invitation.image_url ? "text-white" : "text-gray-900"
+              "text-5xl md:text-7xl lg:text-8xl font-bold leading-tight break-words",
+              invitation.image_url ? "text-white drop-shadow-2xl" : "text-gray-900"
             )}
+            variants={childVariants}
           >
             {invitation.title}
-          </h1>
+          </motion.h1>
           
-          {invitation.description && (
-            <p className={cn(
-              "text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed drop-shadow-lg",
-              invitation.image_url ? "text-white/90" : "text-gray-700"
-            )}>
-              {invitation.description}
-            </p>
-          )}
-        </div>
+          <AnimatePresence>
+            {invitation.description && (
+              <motion.p 
+                className={cn(
+                  "text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed",
+                  invitation.image_url ? "text-white/90 drop-shadow-lg" : "text-gray-700"
+                )}
+                variants={childVariants}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+              >
+                {invitation.description}
+              </motion.p>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
       
-      {/* Decorative Elements */}
-      <div className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl" />
-      <div className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-full blur-xl" />
+      {/* Floating Decorative Elements */}
+      <motion.div 
+        className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"
+        animate={{ 
+          y: [0, -20, 0],
+          x: [0, 10, 0]
+        }}
+        transition={{ 
+          duration: 6,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+      />
+      <motion.div 
+        className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-full blur-xl"
+        animate={{ 
+          y: [0, 15, 0],
+          x: [0, -8, 0]
+        }}
+        transition={{ 
+          duration: 4,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          delay: 2
+        }}
+      />
     </div>
   );
 }
 
-function DetailsFrame({ invitation, template, className }: { 
+function DetailsFrame({ 
+  invitation, 
+  template, 
+  childVariants,
+  className 
+}: { 
   invitation: Invitation; 
   template: any; 
+  childVariants: any;
   className?: string;
 }) {
   const defaultBackground = getDefaultBackground(
@@ -454,76 +495,138 @@ function DetailsFrame({ invitation, template, className }: {
   return (
     <div className={cn('details-frame min-h-screen w-full flex items-center justify-center relative overflow-hidden isolate bg-white', className)}>
       {/* Background */}
-      <div 
+      <motion.div 
         className="absolute inset-0"
-        style={{
-          background: defaultBackground
-        }}
+        style={{ background: defaultBackground }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, ease: 'easeOut' }}
       />
       
       {/* Content */}
       <div className="relative z-10 w-full max-w-4xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: 'var(--template-primary)' }}>
+        <motion.div className="text-center mb-16" variants={childVariants}>
+          <motion.h2 
+            className="text-4xl md:text-6xl font-bold mb-6" 
+            style={{ color: 'var(--template-primary)' }}
+            variants={childVariants}
+          >
             Event Details
-          </h2>
-          <div className="w-24 h-1 mx-auto rounded-full" style={{ backgroundColor: 'var(--template-accent)' }} />
-        </div>
+          </motion.h2>
+          <motion.div 
+            className="w-24 h-1 mx-auto rounded-full" 
+            style={{ backgroundColor: 'var(--template-accent)' }}
+            variants={childVariants}
+            initial={{ width: 0 }}
+            animate={{ width: 96 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          />
+        </motion.div>
         
-        <div className="grid gap-8 md:gap-12">
-          {invitation.event_date && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-white/20">
-              <div className="flex items-start space-x-6">
-                <div 
-                  className="p-4 rounded-2xl"
-                  style={{ backgroundColor: 'var(--template-primary)15' }}
-                >
-                  <Calendar className="w-8 h-8" style={{ color: 'var(--template-primary)' }} />
+        <motion.div className="grid gap-8 md:gap-12" variants={childVariants}>
+          <AnimatePresence>
+            {invitation.event_date && (
+              <motion.div 
+                className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-white/20"
+                variants={childVariants}
+                whileHover={{ scale: 1.02, y: -5 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              >
+                <div className="flex items-start space-x-6">
+                  <motion.div 
+                    className="p-4 rounded-2xl"
+                    style={{ backgroundColor: 'var(--template-primary)15' }}
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                  >
+                    <Calendar className="w-8 h-8" style={{ color: 'var(--template-primary)' }} />
+                  </motion.div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Date & Time</h3>
+                    <p className="text-xl text-gray-700 leading-relaxed">
+                      {new Date(invitation.event_date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Date & Time</h3>
-                  <p className="text-xl text-gray-700 leading-relaxed">
-                    {new Date(invitation.event_date).toLocaleDateString('en-US', {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
           
-          {invitation.location && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-white/20">
-              <div className="flex items-start space-x-6">
-                <div 
-                  className="p-4 rounded-2xl"
-                  style={{ backgroundColor: 'var(--template-accent)15' }}
-                >
-                  <MapPin className="w-8 h-8" style={{ color: 'var(--template-accent)' }} />
+          <AnimatePresence>
+            {invitation.location && (
+              <motion.div 
+                className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-white/20"
+                variants={childVariants}
+                whileHover={{ scale: 1.02, y: -5 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              >
+                <div className="flex items-start space-x-6">
+                  <motion.div 
+                    className="p-4 rounded-2xl"
+                    style={{ backgroundColor: 'var(--template-accent)15' }}
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                  >
+                    <MapPin className="w-8 h-8" style={{ color: 'var(--template-accent)' }} />
+                  </motion.div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Location</h3>
+                    <p className="text-xl text-gray-700 leading-relaxed">{invitation.location}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Location</h3>
-                  <p className="text-xl text-gray-700 leading-relaxed">{invitation.location}</p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </div>
       
-      {/* Decorative Elements */}
-      <div className="absolute top-20 left-10 w-40 h-40 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-2xl" />
-      <div className="absolute bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-pink-200/30 to-rose-200/30 rounded-full blur-2xl" />
+      {/* Floating Background Elements */}
+      <motion.div 
+        className="absolute top-20 left-10 w-40 h-40 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-2xl"
+        animate={{ 
+          y: [0, -30, 0],
+          x: [0, 20, 0],
+          rotate: [0, 180, 360]
+        }}
+        transition={{ 
+          duration: 8,
+          repeat: Infinity,
+          ease: 'easeInOut'
+        }}
+      />
+      <motion.div 
+        className="absolute bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-pink-200/30 to-rose-200/30 rounded-full blur-2xl"
+        animate={{ 
+          y: [0, 25, 0],
+          x: [0, -15, 0],
+          rotate: [0, -180, -360]
+        }}
+        transition={{ 
+          duration: 6,
+          repeat: Infinity,
+          ease: 'easeInOut',
+          delay: 1
+        }}
+      />
     </div>
   );
 }
 
-function RSVPFrame({ invitation, template, onRSVPClick, className }: { 
+function RSVPFrame({ 
+  invitation, 
+  template, 
+  childVariants,
+  onRSVPClick, 
+  className 
+}: { 
   invitation: Invitation; 
   template: any; 
+  childVariants: any;
   onRSVPClick?: () => void;
   className?: string;
 }) {
@@ -536,72 +639,166 @@ function RSVPFrame({ invitation, template, onRSVPClick, className }: {
   return (
     <div className={cn('rsvp-frame min-h-screen w-full flex items-center justify-center relative overflow-hidden isolate bg-white', className)}>
       {/* Background */}
-      <div 
+      <motion.div 
         className="absolute inset-0"
-        style={{
-          background: defaultBackground
-        }}
+        style={{ background: defaultBackground }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, ease: 'easeOut' }}
       />
       
       {/* Animated Background Elements */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-white/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl animate-pulse delay-500" />
+        <motion.div 
+          className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.6, 0.3]
+          }}
+          transition={{ 
+            duration: 4,
+            repeat: Infinity,
+            ease: 'easeInOut'
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-white/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.5, 0.2]
+          }}
+          transition={{ 
+            duration: 5,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 1
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.1, 1],
+            opacity: [0.1, 0.3, 0.1]
+          }}
+          transition={{ 
+            duration: 6,
+            repeat: Infinity,
+            ease: 'easeInOut',
+            delay: 2
+          }}
+        />
       </div>
       
       {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <div className="space-y-12">
+      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
+        <motion.div className="space-y-12" variants={childVariants}>
           {/* Icon */}
-          <div className="relative">
-            <div 
+          <motion.div 
+            className="relative"
+            variants={childVariants}
+          >
+            <motion.div 
               className="w-32 h-32 mx-auto rounded-full flex items-center justify-center"
               style={{ backgroundColor: 'var(--template-primary)' }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               <Heart className="w-16 h-16 text-white" />
-            </div>
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <div 
-                className="w-4 h-4 rounded-full animate-ping"
+            </motion.div>
+            <motion.div 
+              className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center"
+              animate={{ 
+                scale: [1, 1.2, 1],
+                rotate: [0, 180, 360]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                ease: 'easeInOut'
+              }}
+            >
+              <motion.div 
+                className="w-4 h-4 rounded-full"
                 style={{ backgroundColor: 'var(--template-accent)' }}
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ 
+                  duration: 1,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
+                }}
               />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
           
           {/* Title */}
-          <div>
-            <h2 className="text-5xl md:text-7xl font-bold mb-6 text-gray-900 drop-shadow-xl">
+          <motion.div variants={childVariants}>
+            <motion.h2 
+              className="text-5xl md:text-7xl font-bold mb-6 text-gray-900"
+              variants={childVariants}
+            >
               Join Us!
-            </h2>
-            <div className="w-32 h-1 mx-auto rounded-full" style={{ backgroundColor: 'var(--template-accent)' }} />
-          </div>
+            </motion.h2>
+            <motion.div 
+              className="w-32 h-1 mx-auto rounded-full" 
+              style={{ backgroundColor: 'var(--template-accent)' }}
+              initial={{ width: 0 }}
+              animate={{ width: 128 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            />
+          </motion.div>
           
           {/* Description */}
-          <p className="text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto leading-relaxed drop-shadow-lg">
+          <motion.p 
+            className="text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto leading-relaxed"
+            variants={childVariants}
+          >
             We can't wait to celebrate with you. Please let us know if you'll be joining us.
-          </p>
+          </motion.p>
           
           {/* CTA Button */}
-          <div className="pt-8">
-            <Button 
-              onClick={onRSVPClick}
-              size="lg"
-              className="px-12 py-6 text-xl font-bold bg-white text-gray-900 hover:bg-gray-50 shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 rounded-2xl"
+          <motion.div 
+            className="pt-8"
+            variants={childVariants}
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
-              RSVP Now
-              <Heart className="w-6 h-6 ml-3" style={{ color: 'var(--template-primary)' }} />
-            </Button>
-          </div>
-        </div>
+              <Button 
+                onClick={onRSVPClick}
+                size="lg"
+                className="px-12 py-6 text-xl font-bold bg-white text-gray-900 hover:bg-gray-50 shadow-2xl rounded-2xl"
+              >
+                RSVP Now
+                <motion.div
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ 
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: 'easeInOut'
+                  }}
+                >
+                  <Heart className="w-6 h-6 ml-3" style={{ color: 'var(--template-primary)' }} />
+                </motion.div>
+              </Button>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
 }
 
-function GalleryFrame({ invitation, template, className }: { 
+function GalleryFrame({ 
+  invitation, 
+  template, 
+  childVariants,
+  className 
+}: { 
   invitation: Invitation; 
   template: any; 
+  childVariants: any;
   className?: string;
 }) {
   const defaultBackground = getDefaultBackground(
@@ -613,65 +810,121 @@ function GalleryFrame({ invitation, template, className }: {
   return (
     <div className={cn('gallery-frame min-h-screen w-full flex items-center justify-center relative overflow-hidden isolate bg-white', className)}>
       {/* Background */}
-      <div 
+      <motion.div 
         className="absolute inset-0"
-        style={{
-          background: invitation.image_url ? 'black' : defaultBackground
-        }}
+        style={{ background: invitation.image_url ? 'black' : defaultBackground }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, ease: 'easeOut' }}
       />
       
       {/* Content */}
       <div className="relative z-10 w-full h-full">
-        {invitation.image_url ? (
-          <>
-            {/* Main Image */}
-            <div className="relative w-full h-full flex items-center justify-center">
-              <img 
-                src={invitation.image_url} 
-                alt={invitation.title}
-                className="max-w-full max-h-full object-contain"
-              />
+        <AnimatePresence mode="wait">
+          {invitation.image_url ? (
+            <motion.div
+              key="with-image"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+            >
+              {/* Main Image */}
+              <div className="relative w-full h-full flex items-center justify-center">
+                <motion.img 
+                  src={invitation.image_url} 
+                  alt={invitation.title}
+                  className="max-w-full max-h-full object-contain"
+                  initial={{ opacity: 0, scale: 1.1 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 1.2, ease: 'easeOut' }}
+                />
+                
+                {/* Image Overlay */}
+                <motion.div 
+                  className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                />
+              </div>
               
-              {/* Image Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
-            </div>
-            
-            {/* Title Overlay */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-20">
-              <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-8">
-                <h2 className="text-4xl md:text-6xl font-bold text-white drop-shadow-2xl mb-4">
+              {/* Title Overlay */}
+              <motion.div 
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center z-20"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+              >
+                <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                  <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">
+                    Gallery
+                  </h2>
+                  <motion.div 
+                    className="w-24 h-1 mx-auto rounded-full" 
+                    style={{ backgroundColor: 'var(--template-accent)' }}
+                    initial={{ width: 0 }}
+                    animate={{ width: 96 }}
+                    transition={{ duration: 0.8, delay: 1 }}
+                  />
+                </div>
+              </motion.div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="no-image"
+              className="w-full h-full flex items-center justify-center"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 30 }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
+            >
+              <div className="text-center">
+                <motion.div 
+                  className="w-32 h-32 mx-auto rounded-full flex items-center justify-center mb-8"
+                  style={{ backgroundColor: 'var(--template-primary)20' }}
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                >
+                  <Users className="w-16 h-16" style={{ color: 'var(--template-primary)' }} />
+                </motion.div>
+                <h2 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: 'var(--template-primary)' }}>
                   Gallery
                 </h2>
-                <div className="w-24 h-1 mx-auto rounded-full" style={{ backgroundColor: 'var(--template-accent)' }} />
+                <p className="text-xl text-gray-600">
+                  Memories to be made...
+                </p>
               </div>
-            </div>
-          </>
-        ) : (
-          // No Image Placeholder
-          <div className="w-full h-full flex items-center justify-center">
-            <div className="text-center">
-              <div 
-                className="w-32 h-32 mx-auto rounded-full flex items-center justify-center mb-8"
-                style={{ backgroundColor: 'var(--template-primary)20' }}
-              >
-                <Users className="w-16 h-16" style={{ color: 'var(--template-primary)' }} />
-              </div>
-              <h2 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: 'var(--template-primary)' }}>
-                Gallery
-              </h2>
-              <p className="text-xl text-gray-600">
-                Memories to be made...
-              </p>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       
-      {/* Decorative corner elements */}
-      <div className="absolute top-8 left-8 w-16 h-16 border-l-4 border-t-4 border-white/30 rounded-tl-lg" />
-      <div className="absolute top-8 right-8 w-16 h-16 border-r-4 border-t-4 border-white/30 rounded-tr-lg" />
-      <div className="absolute bottom-8 left-8 w-16 h-16 border-l-4 border-b-4 border-white/30 rounded-bl-lg" />
-      <div className="absolute bottom-8 right-8 w-16 h-16 border-r-4 border-b-4 border-white/30 rounded-br-lg" />
+      {/* Animated decorative corner elements */}
+      <motion.div 
+        className="absolute top-8 left-8 w-16 h-16 border-l-4 border-t-4 border-white/30 rounded-tl-lg"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+      />
+      <motion.div 
+        className="absolute top-8 right-8 w-16 h-16 border-r-4 border-t-4 border-white/30 rounded-tr-lg"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.7 }}
+      />
+      <motion.div 
+        className="absolute bottom-8 left-8 w-16 h-16 border-l-4 border-b-4 border-white/30 rounded-bl-lg"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.9 }}
+      />
+      <motion.div 
+        className="absolute bottom-8 right-8 w-16 h-16 border-r-4 border-b-4 border-white/30 rounded-br-lg"
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 1.1 }}
+      />
     </div>
   );
 }
