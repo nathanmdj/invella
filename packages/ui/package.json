@@ -128,6 +128,9 @@
     "./marketing": "./src/makerkit/marketing/index.tsx",
     "./template-renderer": "./src/makerkit/template-renderer.tsx",
     "./invitation-frames": "./src/makerkit/invitation-frames.tsx",
+    "./countdown-timer": "./src/makerkit/countdown-timer.tsx",
+    "./gesture-handler": "./src/makerkit/gesture-handler.tsx",
+    "./interactive-button": "./src/makerkit/interactive-button.tsx",
     "./use-toast": "./src/hooks/use-toast.ts"
   },
   "typesVersions": {

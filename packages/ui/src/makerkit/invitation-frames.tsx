@@ -3,9 +3,9 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring, useInView, Variants } from 'framer-motion';
 import { cn } from '../lib/utils';
-import { Button } from '../shadcn/button';
 import { Badge } from '../shadcn/badge';
 import { Calendar, MapPin, Users, Heart } from 'lucide-react';
+import { InteractiveButton } from './interactive-button';
 import type { Database } from '@kit/supabase/database';
 
 type Invitation = Database['public']['Tables']['invitations']['Row'];
@@ -920,50 +920,48 @@ function RSVPFrame({
             className="pt-8"
             variants={childVariants}
           >
-            <motion.div
-              whileHover={{ scale: 1.05, y: -3 }}
-              whileTap={{ scale: 0.95 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            <InteractiveButton
+              onClick={onRSVPClick}
+              variant="liquid"
+              size="xl"
+              hapticFeedback="medium"
+              soundEffect="success"
+              rippleEffect={true}
+              className="px-16 py-8 text-2xl font-bold shadow-2xl rounded-3xl premium-card typography-modern morph-hover"
+              style={{
+                background: `linear-gradient(135deg, var(--template-primary), var(--template-accent))`,
+                color: 'white',
+                border: 'none'
+              }}
             >
-              <Button 
-                onClick={onRSVPClick}
-                size="lg"
-                className="px-16 py-8 text-2xl font-bold shadow-2xl rounded-3xl premium-card typography-modern"
-                style={{
-                  background: `linear-gradient(135deg, var(--template-primary), var(--template-accent))`,
-                  color: 'white',
-                  border: 'none'
+              <motion.span
+                animate={{ 
+                  textShadow: [
+                    '0 0 0 rgba(255,255,255,0)',
+                    '0 0 20px rgba(255,255,255,0.5)',
+                    '0 0 0 rgba(255,255,255,0)'
+                  ]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: 'easeInOut'
                 }}
               >
-                <motion.span
-                  animate={{ 
-                    textShadow: [
-                      '0 0 0 rgba(255,255,255,0)',
-                      '0 0 20px rgba(255,255,255,0.5)',
-                      '0 0 0 rgba(255,255,255,0)'
-                    ]
-                  }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: 'easeInOut'
-                  }}
-                >
-                  RSVP Now
-                </motion.span>
-                <motion.div
-                  animate={{ x: [0, 8] }}
-                  transition={{ 
-                    duration: 2,
-                    repeat: Infinity,
-                    repeatType: "reverse",
+                RSVP Now
+              </motion.span>
+              <motion.div
+                animate={{ x: [0, 8] }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
                     ease: 'easeInOut'
                   }}
                 >
                   <Heart className="w-8 h-8 ml-4 drop-shadow-lg" />
                 </motion.div>
-              </Button>
-            </motion.div>
+            </InteractiveButton>
           </motion.div>
         </motion.div>
       </div>
