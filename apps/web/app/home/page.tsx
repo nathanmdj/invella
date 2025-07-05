@@ -1,8 +1,5 @@
-import { Button } from '@kit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { PageBody, PageHeader } from '@kit/ui/page';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
 import { getUserInvitations } from '@kit/invitations/server/actions';
 import { InvitationListClient } from '@kit/invitations/invitation-list-client';
 
@@ -20,12 +17,6 @@ export default async function HomePage() {
         title="Your Invitations"
         description="Manage your events and track RSVPs"
       >
-        <Button asChild size="lg">
-          <Link href="/home/create">
-            <Plus className="h-5 w-5 mr-2" />
-            Create Invitation
-          </Link>
-        </Button>
       </PageHeader>
 
       <div className="grid gap-6 px-4">
