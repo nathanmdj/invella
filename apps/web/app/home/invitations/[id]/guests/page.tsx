@@ -50,7 +50,7 @@ export default function InvitationGuestsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <GuestForm invitationId={invitationId} />
+              <GuestForm invitationId={invitationId} onSubmit={() => {}} />
             </CardContent>
           </Card>
         </div>

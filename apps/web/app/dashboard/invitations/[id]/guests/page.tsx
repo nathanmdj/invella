@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { GuestList } from '@kit/invitations/components/guest-list';
-import { GuestForm } from '@kit/invitations/components/guest-form';
+import { GuestList } from '@kit/invitations/guest-list';
+import { GuestForm } from '@kit/invitations/guest-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Button } from '@kit/ui/button';
 import { Input } from '@kit/ui/input';
@@ -20,13 +20,23 @@ import {
   Search 
 } from 'lucide-react';
 import Link from 'next/link';
+import { useCreateGuest } from '@kit/invitations/hooks/use-guest-data';
+import type { CreateGuest } from '@kit/invitations/schema/guest.schema';
 
 export default function GuestManagementPage() {
   const params = useParams();
   const invitationId = params.id as string;
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showAddGuest, setShowAddGuest] = useState(false);
+  
+  const { mutate: createGuest, isPending: isCreating } = useCreateGuest();
+
+  const handleCreateGuest = (data: CreateGuest) => {
+    createGuest(data, {
+      onSuccess: () => {
+        setShowAddGuest(false);
+      },
+    });
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -63,8 +73,9 @@ export default function GuestManagementPage() {
               </DialogHeader>
               <GuestForm 
                 invitationId={invitationId}
-                onSuccess={() => setShowAddGuest(false)}
+                onSubmit={handleCreateGuest}
                 onCancel={() => setShowAddGuest(false)}
+                isLoading={isCreating}
               />
             </DialogContent>
           </Dialog>
@@ -72,56 +83,6 @@ export default function GuestManagementPage() {
       </div>
 
       <div className="grid gap-6">
-        {/* Filters and Search */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Search & Filter</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search guests by name or email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant={filterStatus === 'all' ? 'default' : 'outline'}
-                  onClick={() => setFilterStatus('all')}
-                  size="sm"
-                >
-                  All
-                </Button>
-                <Button
-                  variant={filterStatus === 'attending' ? 'default' : 'outline'}
-                  onClick={() => setFilterStatus('attending')}
-                  size="sm"
-                >
-                  Attending
-                </Button>
-                <Button
-                  variant={filterStatus === 'not_attending' ? 'default' : 'outline'}
-                  onClick={() => setFilterStatus('not_attending')}
-                  size="sm"
-                >
-                  Not Attending
-                </Button>
-                <Button
-                  variant={filterStatus === 'pending' ? 'default' : 'outline'}
-                  onClick={() => setFilterStatus('pending')}
-                  size="sm"
-                >
-                  Pending
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Guest List */}
         <Card>
           <CardHeader>
@@ -130,9 +91,6 @@ export default function GuestManagementPage() {
           <CardContent>
             <GuestList 
               invitationId={invitationId}
-              searchTerm={searchTerm}
-              filterStatus={filterStatus}
-              showActions={true}
             />
           </CardContent>
         </Card>
