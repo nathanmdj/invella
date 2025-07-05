@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { TemplateAdminList } from '@kit/invitations';
+import { TemplateAdminList } from '@kit/invitations/template-admin-list';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Button } from '@kit/ui/button';
 import { Plus } from 'lucide-react';

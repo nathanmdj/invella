@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { TemplateForm } from '@kit/invitations';
+import { TemplateForm } from '@kit/invitations/template-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Button } from '@kit/ui/button';
 import { ArrowLeft } from 'lucide-react';
