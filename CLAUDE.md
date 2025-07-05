@@ -126,9 +126,10 @@ The project uses Turborepo with workspace packages:
 - Sidebar navigation with collapsible support
 
 #### Data Fetching
-- React Query (`@tanstack/react-query`) for client-side data fetching
-- Server actions for mutations
-- Custom hooks in feature packages for data management
+- **Server Components by Default**: Always create pages as server components for optimal performance
+- **Server Actions First**: Prioritize server actions over Next.js API routes for data mutations and fetching
+- **Hooks for Client-Side Only**: Use React Query hooks only when client-side data fetching is necessary (real-time updates, user interactions)
+- **Navigation Optimization**: Use Next.js Link component instead of buttons for navigation with prefetching enabled
 
 #### UI Components
 - Shadcn UI components in `packages/ui/src/shadcn/`
@@ -229,4 +230,7 @@ When working with this codebase, always:
 7. Ensure mobile-first responsive design in all new components
 8. Follow PWA best practices for offline functionality
 9. Maintain comprehensive type safety throughout the application
-10. Use React Query for all data fetching with proper error handling
+10. **Create server components by default** - Only use client components when necessary (interactivity, hooks, browser APIs)
+11. **Use server actions instead of API routes** - Prioritize server actions for data operations and mutations
+12. **Optimize navigation** - Use Next.js Link with prefetching for all navigation, avoid buttons for page transitions
+13. **Minimize client-side data fetching** - Use React Query hooks only when server-side data fetching is not sufficient
