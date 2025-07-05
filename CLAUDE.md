@@ -113,10 +113,11 @@ The project uses Turborepo with workspace packages:
 #### Route Structure
 - Marketing pages: `apps/web/app/(marketing)/` - Landing page with elegant design
 - Auth pages: `apps/web/app/auth/` - Authentication flows
-- Protected app pages: `apps/web/app/home/` - Main dashboard and invitation management
-- Invitation creation: `apps/web/app/create/` - Invitation creation form
-- Public invitation view: `apps/web/app/invite/[id]/` - Public invitation display
-- RSVP submission: `apps/web/app/invite/[id]/rsvp/` - Anonymous RSVP form
+- Protected app pages: `apps/web/app/home/` - Main dashboard with real-time statistics
+- Invitation creation: `apps/web/app/home/create/` - Multi-step invitation creation form
+- Public invitation view: `apps/web/app/invite/[id]/` - Full-screen invitation display with template rendering
+- RSVP submission: `apps/web/app/invite/[id]/rsvp/` - Anonymous RSVP form with guest lookup
+- Dashboard: `apps/web/app/dashboard/` - Admin dashboard for invitation management
 - Offline support: `apps/web/app/offline/` - PWA offline page
 - Route configuration: `apps/web/config/paths.config.ts`
 
@@ -169,13 +170,14 @@ Key environment variables are defined in `turbo.json` globalEnv section.
 - `@kit/accounts` - Account management and settings
 
 ### Key Features (Fully Implemented)
-- **Invitation Creation**: Complete form-based invitation creation with template selection, event details, and image support
-- **Guest Management**: Add guests manually, auto-generate guest codes, track RSVP status with comprehensive statistics
-- **Template System**: Infrastructure for beautiful invitation templates with design configurations
-- **Sharing**: Direct link sharing with public invitation pages
+- **Invitation Creation**: Multi-step form-based invitation creation with template selection, event details, and image support
+- **Guest Management**: Add guests manually, auto-generate guest codes, track RSVP status with comprehensive statistics and real-time updates
+- **Template System**: Visual template frames with customization options and full-screen rendering
+- **Sharing**: Direct link sharing with public invitation pages and QR code generation
 - **RSVP System**: Anonymous guest lookup via secure codes, comprehensive RSVP forms with dietary restrictions and plus-one support
 - **PWA Support**: Full offline capabilities, installable app, background sync for RSVP submissions
-- **Real-time Dashboard**: Live RSVP tracking, guest statistics, and invitation management
+- **Real-time Dashboard**: Live RSVP tracking, guest statistics, invitation management with real-time updates
+- **Public Pages**: Full-screen invitation display with template rendering and anonymous access
 - **Elegant UI**: Beautiful, responsive design with gradient styling and mobile-first approach
 
 ### TypeScript Configuration
@@ -202,21 +204,23 @@ The application is **production-ready** with all core features fully implemented
 - **Authentication System**: Complete Supabase Auth with MFA support and session management
 - **Landing Page**: Beautiful, modern design with gradient styling and feature showcase
 - **Dashboard**: Real-time invitation management with statistics and RSVP tracking
-- **Invitation Creation**: Full CRUD operations with form validation and image support
-- **Guest Management**: Guest list creation, unique code generation, and status tracking
+- **Invitation Creation**: Multi-step form with template selection, event details, and image support
+- **Guest Management**: Guest list creation, unique code generation, status tracking, and bulk operations
 - **RSVP System**: Anonymous guest lookup, comprehensive RSVP forms, and real-time updates
+- **Public Pages**: Full-screen invitation display with template rendering and anonymous access
+- **Template System**: Visual template frames with customization and full-screen rendering
 - **PWA Functionality**: Service worker, offline support, and installable app capabilities
-- **Database Schema**: Complete schema with RLS policies and type generation
+- **Database Schema**: Complete schema with RLS policies, real-time subscriptions, and type generation
 - **Security**: CSRF protection, anonymous access controls, and secure guest codes
 - **Responsive Design**: Mobile-first approach with beautiful UI components
 
 ### 🔄 Areas for Future Enhancement
-- **Template Gallery**: Pre-built invitation templates with themes
 - **Email Integration**: Automated invitation sending and reminders
 - **Advanced Analytics**: Detailed event metrics and reporting
-- **Social Media Integration**: Enhanced sharing capabilities
+- **Template Customization**: Advanced theme and color customization options
 - **Multi-language Support**: I18n for global use
-- **Advanced Customization**: Theme and color customization options
+- **Mobile App**: React Native companion app
+- **Advanced Sharing**: Enhanced social media integration and QR code features
 
 ## Development Guidelines
 

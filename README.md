@@ -246,9 +246,10 @@ apps/
 │   ├── app/               # App Router pages
 │   │   ├── (marketing)/   # Public pages
 │   │   ├── auth/          # Authentication
-│   │   ├── create/        # Invitation creation (planned)
-│   │   ├── invite/        # Public invitation views (planned)
-│   │   ├── dashboard/     # User dashboard (planned)
+│   │   ├── home/create/   # Multi-step invitation creation form
+│   │   ├── invite/        # Full-screen invitation display with template rendering
+│   │   ├── dashboard/     # Admin dashboard for invitation management
+│   │   ├── home/          # Main user dashboard with statistics
 │   │   └── offline/       # PWA offline page
 │   ├── supabase/          # Database schema & migrations
 │   ├── public/            # Static assets & PWA files
@@ -271,24 +272,27 @@ packages/
 ### Key Features & Packages
 
 **@kit/invitations Package:**
-- Invitation creation and management components
-- Template gallery with categorization
-- Guest list management (manual entry, CSV import)
-- Sharing functionality (QR codes, social media, direct links)
-- Real-time invitation analytics
+- Complete invitation CRUD operations with multi-step creation flow
+- Template system with visual frames and customization
+- Guest list management with bulk operations and status tracking
+- Real-time invitation analytics and statistics
+- Share functionality with QR codes and social media integration
+- Image upload and management for invitation backgrounds
 
 **@kit/rsvp Package:**
-- Anonymous guest lookup by secure codes
-- RSVP forms with dietary restrictions and plus-ones
-- Public invitation viewing
-- Offline RSVP with background sync
-- Response tracking and management
+- Anonymous guest lookup by secure codes with validation
+- Comprehensive RSVP forms with dietary restrictions and plus-ones
+- Public invitation viewing with full-screen template rendering
+- Offline RSVP with background sync for PWA support
+- Real-time response tracking and status management
 
 **Authentication & Routes:**
-- Supabase authentication with `@kit/auth`
-- Protected dashboard pages for invitation management
-- Public invitation and RSVP pages (no auth required)
-- Mobile-optimized responsive design
+- Complete Supabase authentication with `@kit/auth` and MFA support
+- Protected dashboard pages for invitation management and analytics
+- Public invitation and RSVP pages with anonymous access
+- Mobile-first responsive design with PWA capabilities
+- Multi-factor authentication with challenge verification
+- Account management with profile updates and security settings
 
 ### Database Schema
 
@@ -387,19 +391,22 @@ Remember to enable Node.js compatibility in the Cloudflare dashboard.
 ## Development Status
 
 **✅ Completed Features:**
-- PWA configuration with offline support
-- Complete database schema with RLS policies
-- Invitation and RSVP feature packages
-- Mobile-first UI components
-- Template system with gallery
-- QR code and social sharing
-- Guest code system for anonymous access
+- PWA configuration with offline support and service worker
+- Complete database schema with RLS policies and real-time subscriptions
+- Full invitation management system with creation, editing, and sharing
+- Anonymous RSVP system with guest code lookup
+- Real-time dashboard with live statistics and tracking
+- Template system with visual frames and customization
+- Mobile-first responsive design with beautiful UI
+- Guest management with bulk operations and status tracking
+- Public invitation pages with full-screen template rendering
+- Complete authentication system with MFA support
 
 **🚧 In Development:**
-- Web pages for invitation creation
-- Public invitation and RSVP views
-- Dashboard and analytics pages
 - Email and SMS notifications
+- Advanced analytics and reporting
+- Template customization tools
+- Mobile app (React Native)
 
 ## Contributing
 
