@@ -8,7 +8,7 @@ export const CreateInvitationSchema = z.object({
   location: z.string().optional(),
   image_url: z.string().url().optional().or(z.literal('')),
   template_id: z.string().uuid().optional(),
-  custom_fields: z.record(z.any()).default({}),
+  custom_fields: z.record(z.any()).optional().default({}),
   max_guests: z.number().positive().optional(),
   rsvp_deadline: z.date().optional(),
 });

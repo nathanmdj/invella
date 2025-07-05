@@ -46,7 +46,7 @@ export function InvitationForm({
       location: initialData?.location || '',
       image_url: initialData?.image_url || '',
       max_guests: initialData?.max_guests || undefined,
-      custom_fields: initialData?.custom_fields || {},
+      custom_fields: initialData?.custom_fields || undefined,
       event_date: initialData?.event_date || undefined,
       rsvp_deadline: initialData?.rsvp_deadline || undefined,
     },
