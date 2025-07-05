@@ -1,16 +1,11 @@
-'use client';
-
-import { useParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { InvitationCard } from '@kit/invitations/invitation-card';
 import { GuestList } from '@kit/invitations/guest-list';
 import { ShareInvitation } from '@kit/invitations/share-invitation';
-import { useInvitation } from '@kit/invitations/hooks/use-invitation-data';
-import { useGuestData } from '@kit/invitations/hooks/use-guest-data';
+import { getUserInvitation, getGuestData } from '@kit/invitations/server/actions';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Button } from '@kit/ui/button';
 import { PageBody, PageHeader } from '@kit/ui/page';
-import { Skeleton } from '@kit/ui/skeleton';
 import { 
   Calendar, 
   MapPin, 
@@ -18,65 +13,25 @@ import {
   Clock,
 } from 'lucide-react';
 import Link from 'next/link';
+import { notFound } from 'next/navigation';
 
-export default function InvitationDetailsPage() {
-  const params = useParams();
-  const invitationId = params.id as string;
+interface InvitationDetailsPageProps {
+  params: { id: string };
+}
 
-  const { data: invitation, isLoading: invitationLoading, error: invitationError } = useInvitation(invitationId);
-  const { rsvpStats, isLoading: guestsLoading } = useGuestData(invitationId);
+export default async function InvitationDetailsPage({ params }: InvitationDetailsPageProps) {
+  const invitationId = params.id;
 
-  if (invitationError) {
-    return (
-      <PageBody>
-        <div className="text-center py-12">
-          <h2 className="text-xl font-semibold mb-2">Invitation Not Found</h2>
-          <p className="text-muted-foreground mb-4">
-            This invitation doesn&apos;t exist or you don&apos;t have permission to view it.
-          </p>
-          <Button asChild>
-            <Link href="/home">Back to Dashboard</Link>
-          </Button>
-        </div>
-      </PageBody>
-    );
-  }
-
-  if (invitationLoading) {
-    return (
-      <PageBody>
-        <PageHeader title={<Skeleton className="h-8 w-64" />} description={<Skeleton className="h-4 w-96" />}>
-          <Skeleton className="h-10 w-32" />
-        </PageHeader>
-        <div className="grid gap-8 lg:grid-cols-3 px-4">
-          <div className="lg:col-span-2 space-y-6">
-            <Skeleton className="h-48 w-full" />
-            <Skeleton className="h-48 w-full" />
-          </div>
-          <div className="space-y-6">
-            <Skeleton className="h-64 w-full" />
-          </div>
-        </div>
-      </PageBody>
-    );
-  }
+  const [invitation, guestData] = await Promise.all([
+    getUserInvitation(invitationId),
+    getGuestData(invitationId)
+  ]);
 
   if (!invitation) {
-    return (
-      <PageBody>
-        <div className="text-center py-12">
-          <h2 className="text-xl font-semibold mb-2">Invitation Not Found</h2>
-          <p className="text-muted-foreground mb-4">
-            This invitation doesn&apos;t exist or you don&apos;t have permission to view it.
-          </p>
-          <Button asChild>
-            <Link href="/home">Back to Dashboard</Link>
-          </Button>
-        </div>
-      </PageBody>
-    );
+    notFound();
   }
 
+  const { rsvpStats } = guestData;
   const eventDate = invitation.event_date ? new Date(invitation.event_date) : null;
   const rsvpDeadline = invitation.rsvp_deadline ? new Date(invitation.rsvp_deadline) : null;
 
@@ -109,35 +64,24 @@ export default function InvitationDetailsPage() {
               <CardTitle>RSVP Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              {guestsLoading ? (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="text-center">
-                      <Skeleton className="h-8 w-16 mx-auto mb-2" />
-                      <Skeleton className="h-4 w-20 mx-auto" />
-                    </div>
-                  ))}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{rsvpStats.total}</div>
+                  <div className="text-sm text-muted-foreground">Total Invited</div>
                 </div>
-              ) : (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{rsvpStats.total}</div>
-                    <div className="text-sm text-muted-foreground">Total Invited</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-600">{rsvpStats.attending}</div>
-                    <div className="text-sm text-muted-foreground">Attending</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-600">{rsvpStats.notAttending}</div>
-                    <div className="text-sm text-muted-foreground">Not Attending</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-yellow-600">{rsvpStats.pending}</div>
-                    <div className="text-sm text-muted-foreground">Pending</div>
-                  </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{rsvpStats.attending}</div>
+                  <div className="text-sm text-muted-foreground">Attending</div>
                 </div>
-              )}
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-red-600">{rsvpStats.notAttending}</div>
+                  <div className="text-sm text-muted-foreground">Not Attending</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-600">{rsvpStats.pending}</div>
+                  <div className="text-sm text-muted-foreground">Pending</div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
