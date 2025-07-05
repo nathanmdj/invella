@@ -8,7 +8,7 @@ export const CreateInvitationSchema = z.object({
   location: z.string().optional(),
   image_url: z.string().url().optional().or(z.literal('')),
   template_id: z.string().uuid().optional(),
-  custom_fields: z.record(z.any()).optional().default({}),
+  custom_fields: z.record(z.any()).default({}),
   max_guests: z.number().positive().optional(),
   rsvp_deadline: z.date().optional(),
 });
@@ -33,6 +33,11 @@ export const InvitationFiltersSchema = z.object({
 export type CreateInvitation = z.infer<typeof CreateInvitationSchema>;
 export type UpdateInvitation = z.infer<typeof UpdateInvitationSchema>;
 export type InvitationFilters = z.infer<typeof InvitationFiltersSchema>;
+
+// Ensure custom_fields is always present in the CreateInvitation type
+export type CreateInvitationWithDefaults = Omit<CreateInvitation, 'custom_fields'> & {
+  custom_fields: Record<string, any>;
+};
 
 // Database types (matches our Supabase schema)
 export interface Invitation {
