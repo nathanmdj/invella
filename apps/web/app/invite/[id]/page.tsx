@@ -51,10 +51,10 @@ async function InvitationContent({ invitationId }: { invitationId: string }) {
         />
 
         {/* Interactive Components (Client-side) */}
-        <InvitationInteractive 
+        {/* <InvitationInteractive 
           invitationId={invitationId} 
           invitationTitle={invitation.title}
-        />
+        /> */}
       </TemplateRenderer>
     </div>
   );
