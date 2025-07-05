@@ -38,7 +38,7 @@
       "name": "Create Invitation",
       "short_name": "Create",
       "description": "Create a new invitation",
-      "url": "/create",
+      "url": "/home/create",
       "icons": [
         {
           "src": "/images/favicon/android-chrome-192x192.png",

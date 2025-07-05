@@ -71,7 +71,7 @@ export function InvitationListClient({
           </p>
         </div>
         <Button asChild className="shrink-0">
-          <Link href="/create">
+          <Link href="/home/create">
             <Plus className="mr-2 h-4 w-4" />
             Create Invitation
           </Link>
@@ -130,7 +130,7 @@ export function InvitationListClient({
           </p>
           {!searchTerm && (
             <Button asChild>
-              <Link href="/create">
+              <Link href="/home/create">
                 <Plus className="mr-2 h-4 w-4" />
                 Create Your First Invitation
               </Link>
