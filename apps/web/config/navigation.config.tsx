@@ -1,4 +1,4 @@
-import { Home, User, Plus } from 'lucide-react';
+import { Home, User, Plus, Settings } from 'lucide-react';
 import { z } from 'zod';
 
 import { NavigationConfigSchema } from '@kit/ui/navigation-schema';
@@ -21,6 +21,16 @@ const routes = [
         label: 'Create Invitation',
         path: '/create',
         Icon: <Plus className={iconClasses} />,
+      },
+    ],
+  },
+  {
+    label: 'Admin',
+    children: [
+      {
+        label: 'Template Management',
+        path: '/home/admin/templates',
+        Icon: <Settings className={iconClasses} />,
       },
     ],
   },
