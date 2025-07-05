@@ -125,7 +125,8 @@
     "./empty-state": "./src/makerkit/empty-state.tsx",
     "./marketing": "./src/makerkit/marketing/index.tsx",
     "./template-renderer": "./src/makerkit/template-renderer.tsx",
-    "./invitation-frames": "./src/makerkit/invitation-frames.tsx"
+    "./invitation-frames": "./src/makerkit/invitation-frames.tsx",
+    "./use-toast": "./src/hooks/use-toast.ts"
   },
   "typesVersions": {
     "*": {
