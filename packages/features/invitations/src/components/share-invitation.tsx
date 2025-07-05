@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   Share2, 
   Copy, 
@@ -36,11 +36,18 @@ interface ShareInvitationProps {
 export function ShareInvitation({
   invitationId,
   invitationTitle,
-  invitationUrl = `${window.location.origin}/invite/${invitationId}`,
+  invitationUrl: invitationUrlProp,
   trigger,
 }: ShareInvitationProps) {
+  const [invitationUrl, setInvitationUrl] = useState(invitationUrlProp || '');
   const [copied, setCopied] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+
+  useEffect(() => {
+    if (!invitationUrlProp && typeof window !== 'undefined') {
+      setInvitationUrl(`${window.location.origin}/invite/${invitationId}`);
+    }
+  }, [invitationId, invitationUrlProp]);
 
   // Generate QR code URL (using a free service)
   const generateQRCode = () => {
