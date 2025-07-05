@@ -30,9 +30,9 @@
     "./schema/invitation.schema": "./src/schema/invitation.schema.ts"
   },
   "dependencies": {
-    "@kit/ui": "workspace:*",
+    "@kit/shared": "workspace:*",
     "@kit/supabase": "workspace:*",
-    "@kit/shared": "workspace:*"
+    "@kit/ui": "workspace:*"
   },
   "devDependencies": {
     "@kit/eslint-config": "workspace:*",
