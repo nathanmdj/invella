@@ -37,7 +37,7 @@ export function InvitationCreateClient() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Create New Invitation</h1>
         <p className="text-muted-foreground">
@@ -45,13 +45,13 @@ export function InvitationCreateClient() {
         </p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-12 gap-x-8 xl:gap-x-16 items-start">
         {/* Template Selection */}
-        <Card>
+        <Card className="h-full flex flex-col min-h-[500px]">
           <CardHeader>
             <CardTitle>Choose Template</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 flex flex-col">
             <TemplateSelector 
               onSelectTemplate={setSelectedTemplate}
               selectedTemplate={selectedTemplate}
@@ -60,11 +60,11 @@ export function InvitationCreateClient() {
         </Card>
 
         {/* Invitation Form */}
-        <Card>
+        <Card className="h-full flex flex-col min-h-[500px]">
           <CardHeader>
             <CardTitle>Event Details</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 flex flex-col">
             <InvitationForm 
               onSubmit={handleSubmit}
               isLoading={isLoading}
