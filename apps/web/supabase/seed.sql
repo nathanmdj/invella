@@ -135,6 +135,72 @@ VALUES
     'https://images.unsplash.com/photo-1527015175922-36a3297687d5?w=400',
     now(),
     now()
+  ),
+  (
+    'g2h3i4j5-k6l7-890m-nopq-r01234567890',
+    'Luxury Gradient Elite',
+    'Premium gradient design with floating diamond elements and luxury typography - ultimate viral appeal',
+    '{"primaryColor": "#c084fc", "accentColor": "#fb7185", "backgroundColor": "linear-gradient(135deg, #c084fc 0%, #fb7185 50%, #fbbf24 100%)", "surfaceColor": "rgba(255, 255, 255, 0.95)", "textColor": "#1f2937", "textSecondaryColor": "#6b7280", "borderColor": "rgba(255, 255, 255, 0.4)", "overlayColor": "rgba(0, 0, 0, 0.1)", "fontFamily": "serif", "layout": "luxury"}',
+    'wedding',
+    true,
+    'https://images.unsplash.com/photo-1583207583288-0d8b77ef8b76?w=400',
+    now(),
+    now()
+  ),
+  (
+    'h3i4j5k6-l7m8-90no-pqrs-t01234567890',
+    'Glassmorphism Pro',
+    'Ultra-modern glassmorphism with particle effects and premium blur - social media perfection',
+    '{"primaryColor": "#06b6d4", "accentColor": "#8b5cf6", "backgroundColor": "linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%)", "surfaceColor": "rgba(255, 255, 255, 0.15)", "textColor": "#ffffff", "textSecondaryColor": "#e0e7ff", "borderColor": "rgba(255, 255, 255, 0.25)", "overlayColor": "rgba(0, 0, 0, 0.2)", "fontFamily": "sans-serif", "layout": "glassmorphism"}',
+    'corporate',
+    true,
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+    now(),
+    now()
+  ),
+  (
+    'i4j5k6l7-m8n9-0opq-rstu-v01234567890',
+    'Neon Nightclub',
+    'Electric neon design with pulsing effects and club aesthetics - guaranteed viral reach',
+    '{"primaryColor": "#ff0080", "accentColor": "#00ffff", "backgroundColor": "linear-gradient(135deg, #ff0080 0%, #8b00ff 50%, #00ffff 100%)", "surfaceColor": "rgba(255, 255, 255, 0.1)", "textColor": "#ffffff", "textSecondaryColor": "#e0e7ff", "borderColor": "rgba(255, 0, 128, 0.4)", "overlayColor": "rgba(0, 0, 0, 0.6)", "fontFamily": "sans-serif", "layout": "neon"}',
+    'birthday',
+    true,
+    'https://images.unsplash.com/photo-1571266028243-d220bc6e7ca1?w=400',
+    now(),
+    now()
+  ),
+  (
+    'j5k6l7m8-n9o0-pqrs-tuvw-x01234567890',
+    'Minimalist Platinum',
+    'Ultra-clean minimalist design with platinum accents and perfect typography - luxury redefined',
+    '{"primaryColor": "#475569", "accentColor": "#e2e8f0", "backgroundColor": "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)", "surfaceColor": "rgba(255, 255, 255, 0.98)", "textColor": "#1e293b", "textSecondaryColor": "#64748b", "borderColor": "rgba(148, 163, 184, 0.3)", "overlayColor": "rgba(0, 0, 0, 0.02)", "fontFamily": "sans-serif", "layout": "minimalist"}',
+    'corporate',
+    true,
+    'https://images.unsplash.com/photo-1617791160536-598cf32026fb?w=400',
+    now(),
+    now()
+  ),
+  (
+    'k6l7m8n9-o0p1-qrst-uvwx-y01234567890',
+    'Retro Synthwave',
+    'Nostalgic 80s synthwave with neon grids and retro typography - peak viral potential',
+    '{"primaryColor": "#ff1493", "accentColor": "#00ffff", "backgroundColor": "linear-gradient(135deg, #1a1a2e 0%, #e94560 50%, #ff1493 100%)", "surfaceColor": "rgba(255, 20, 147, 0.1)", "textColor": "#ffffff", "textSecondaryColor": "#ff69b4", "borderColor": "rgba(255, 20, 147, 0.4)", "overlayColor": "rgba(0, 0, 0, 0.7)", "fontFamily": "monospace", "layout": "retro"}',
+    'birthday',
+    true,
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+    now(),
+    now()
+  ),
+  (
+    'l7m8n9o0-p1q2-rstu-vwxy-z01234567890',
+    'Botanical Zen',
+    'Sophisticated nature-inspired design with organic shapes and premium green gradients',
+    '{"primaryColor": "#059669", "accentColor": "#34d399", "backgroundColor": "linear-gradient(135deg, #6ee7b7 0%, #059669 50%, #047857 100%)", "surfaceColor": "rgba(255, 255, 255, 0.92)", "textColor": "#064e3b", "textSecondaryColor": "#047857", "borderColor": "rgba(52, 211, 153, 0.3)", "overlayColor": "rgba(0, 0, 0, 0.05)", "fontFamily": "serif", "layout": "botanical"}',
+    'other',
+    true,
+    'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400',
+    now(),
+    now()
   );
 
 -- Note: Since we're using UUIDs, no sequence update is needed
