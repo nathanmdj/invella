@@ -12,6 +12,8 @@
     "./invitation-form": "./src/components/invitation-form.tsx",
     "./invitation-card": "./src/components/invitation-card.tsx",
     "./invitation-list": "./src/components/invitation-list.tsx",
+    "./invitation-list-client": "./src/components/invitation-list-client.tsx",
+    "./invitation-create-client": "./src/components/invitation-create-client.tsx",
     "./template-selector": "./src/components/template-selector.tsx",
     "./share-invitation": "./src/components/share-invitation.tsx",
     "./guest-list": "./src/components/guest-list.tsx",
