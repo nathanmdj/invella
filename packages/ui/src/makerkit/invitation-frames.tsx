@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring, useInView } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { Button } from '../shadcn/button';
 import { Badge } from '../shadcn/badge';
-import { Card } from '../shadcn/card';
-import { ChevronLeft, ChevronRight, Calendar, MapPin, Users, Heart } from 'lucide-react';
+import { Calendar, MapPin, Users, Heart } from 'lucide-react';
 import type { Database } from '@kit/supabase/database';
 
 type Invitation = Database['public']['Tables']['invitations']['Row'];
@@ -18,14 +17,16 @@ interface FrameConfig {
   showInNavigation?: boolean;
 }
 
+interface TemplateConfig {
+  id: string;
+  name: string;
+  category: string;
+  design_config: Record<string, unknown>;
+}
+
 interface InvitationFramesProps {
   invitation: Invitation;
-  template: {
-    id: string;
-    name: string;
-    category: string;
-    design_config: any;
-  };
+  template: TemplateConfig;
   frames: FrameConfig[];
   onRSVPClick?: () => void;
   className?: string;
@@ -43,7 +44,7 @@ export function InvitationFrames({
   
   // Framer Motion scroll tracking
   const { scrollY } = useScroll({ container: containerRef });
-  const springScrollY = useSpring(scrollY, { stiffness: 100, damping: 30 });
+  useSpring(scrollY, { stiffness: 100, damping: 30 });
 
   // Smooth scroll to frame with Framer Motion
   const scrollToFrame = useCallback((index: number) => {
@@ -199,12 +200,7 @@ export function InvitationFrames({
 interface InvitationFrameProps {
   frame: FrameConfig;
   invitation: Invitation;
-  template: {
-    id: string;
-    name: string;
-    category: string;
-    design_config: any;
-  };
+  template: TemplateConfig;
   index: number;
   isActive: boolean;
   onRSVPClick?: () => void;
@@ -214,8 +210,6 @@ function InvitationFrame({
   frame, 
   invitation, 
   template, 
-  index,
-  isActive,
   onRSVPClick 
 }: InvitationFrameProps) {
   const ref = useRef<HTMLDivElement>(null);
@@ -323,38 +317,24 @@ function InvitationFrame({
   }
 }
 
-// Helper function to get default background based on template category
-function getDefaultBackground(category: string, primaryColor: string, accentColor: string) {
-  const backgrounds = {
-    wedding: `linear-gradient(135deg, ${primaryColor}10, ${accentColor}10, #fdf2f8 30%, #f8fafc 70%)`,
-    birthday: `linear-gradient(135deg, ${primaryColor}15, ${accentColor}15, #fef3c7 30%, #dbeafe 70%)`,
-    corporate: `linear-gradient(135deg, ${primaryColor}12, ${accentColor}12, #f1f5f9 30%, #f8fafc 70%)`,
-    anniversary: `linear-gradient(135deg, ${primaryColor}12, ${accentColor}12, #fdf2f8 30%, #fffbeb 70%)`,
-    graduation: `linear-gradient(135deg, ${primaryColor}15, ${accentColor}15, #dbeafe 30%, #f0f9ff 70%)`,
-    baby_shower: `linear-gradient(135deg, ${primaryColor}10, ${accentColor}10, #fef3c7 30%, #ecfdf5 70%)`,
-    holiday: `linear-gradient(135deg, ${primaryColor}15, ${accentColor}15, #fef2f2 30%, #f0fdf4 70%)`,
-    other: `linear-gradient(135deg, ${primaryColor}12, ${accentColor}12, #f8fafc 30%, #f1f5f9 70%)`
-  };
-  return backgrounds[category as keyof typeof backgrounds] || backgrounds.other;
+// Helper function to get default background using CSS variables
+function getDefaultBackground() {
+  return 'var(--template-background)';
 }
 
 // Individual Frame Components with Framer Motion
 function HeroFrame({ 
   invitation, 
-  template, 
+  template,
   childVariants,
   className 
 }: { 
   invitation: Invitation; 
-  template: any; 
+  template: TemplateConfig;
   childVariants: any;
   className?: string;
 }) {
-  const defaultBackground = getDefaultBackground(
-    template.category,
-    template.design_config?.primaryColor || '#3b82f6',
-    template.design_config?.accentColor || '#f59e0b'
-  );
+  const defaultBackground = getDefaultBackground();
 
   return (
     <div 
@@ -370,9 +350,12 @@ function HeroFrame({
               variant="outline" 
               className={cn(
                 "text-sm px-6 py-2 border-0 shadow-lg backdrop-blur-sm",
-                invitation.image_url ? "bg-white/80" : "bg-white/90"
+                invitation.image_url ? "bg-white/80" : ""
               )}
-              style={{ color: 'var(--template-primary)' }}
+              style={{ 
+                color: 'var(--template-primary)',
+                backgroundColor: invitation.image_url ? 'rgba(255, 255, 255, 0.8)' : 'var(--template-surface)'
+              }}
             >
               {template.category.charAt(0).toUpperCase() + template.category.slice(1).replace('_', ' ')}
             </Badge>
@@ -381,8 +364,11 @@ function HeroFrame({
           <motion.h1 
             className={cn(
               "text-5xl md:text-7xl lg:text-8xl font-bold leading-tight break-words",
-              invitation.image_url ? "text-white drop-shadow-2xl" : "text-gray-900"
+              invitation.image_url ? "text-white drop-shadow-2xl" : ""
             )}
+            style={{ 
+              color: invitation.image_url ? 'white' : 'var(--template-text)'
+            }}
             variants={childVariants}
           >
             {invitation.title}
@@ -393,8 +379,11 @@ function HeroFrame({
               <motion.p 
                 className={cn(
                   "text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed",
-                  invitation.image_url ? "text-white/90 drop-shadow-lg" : "text-gray-700"
+                  invitation.image_url ? "text-white/90 drop-shadow-lg" : ""
                 )}
+                style={{ 
+                  color: invitation.image_url ? 'rgba(255, 255, 255, 0.9)' : 'var(--template-text-secondary)'
+                }}
                 variants={childVariants}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -439,20 +428,16 @@ function HeroFrame({
 
 function DetailsFrame({ 
   invitation, 
-  template, 
+  template,
   childVariants,
   className 
 }: { 
   invitation: Invitation; 
-  template: any; 
+  template: TemplateConfig;
   childVariants: any;
   className?: string;
 }) {
-  const defaultBackground = getDefaultBackground(
-    template.category,
-    template.design_config?.primaryColor || '#3b82f6',
-    template.design_config?.accentColor || '#f59e0b'
-  );
+  const defaultBackground = getDefaultBackground();
 
   return (
     <div 
@@ -484,7 +469,13 @@ function DetailsFrame({
           <AnimatePresence>
             {invitation.event_date && (
               <motion.div 
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-white/20"
+                className="backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl"
+                style={{
+                  backgroundColor: 'var(--template-surface)',
+                  borderColor: 'var(--template-border)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid'
+                }}
                 variants={childVariants}
                 whileHover={{ scale: 1.02, y: -5 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -499,8 +490,8 @@ function DetailsFrame({
                     <Calendar className="w-8 h-8" style={{ color: 'var(--template-primary)' }} />
                   </motion.div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Date & Time</h3>
-                    <p className="text-xl text-gray-700 leading-relaxed">
+                    <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--template-text)' }}>Date & Time</h3>
+                    <p className="text-xl leading-relaxed" style={{ color: 'var(--template-text-secondary)' }}>
                       {new Date(invitation.event_date).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
@@ -517,7 +508,13 @@ function DetailsFrame({
           <AnimatePresence>
             {invitation.location && (
               <motion.div 
-                className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl border border-white/20"
+                className="backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl"
+                style={{
+                  backgroundColor: 'var(--template-surface)',
+                  borderColor: 'var(--template-border)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid'
+                }}
                 variants={childVariants}
                 whileHover={{ scale: 1.02, y: -5 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -532,8 +529,8 @@ function DetailsFrame({
                     <MapPin className="w-8 h-8" style={{ color: 'var(--template-accent)' }} />
                   </motion.div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-3">Location</h3>
-                    <p className="text-xl text-gray-700 leading-relaxed">{invitation.location}</p>
+                    <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--template-text)' }}>Location</h3>
+                    <p className="text-xl leading-relaxed" style={{ color: 'var(--template-text-secondary)' }}>{invitation.location}</p>
                   </div>
                 </div>
               </motion.div>
@@ -575,23 +572,19 @@ function DetailsFrame({
 }
 
 function RSVPFrame({ 
-  invitation, 
-  template, 
+  invitation,
+  template,
   childVariants,
   onRSVPClick, 
   className 
 }: { 
-  invitation: Invitation; 
-  template: any; 
+  invitation: Invitation;
+  template: TemplateConfig;
   childVariants: any;
   onRSVPClick?: () => void;
   className?: string;
 }) {
-  const defaultBackground = getDefaultBackground(
-    template.category,
-    template.design_config?.primaryColor || '#3b82f6',
-    template.design_config?.accentColor || '#f59e0b'
-  );
+  const defaultBackground = getDefaultBackground();
 
   return (
     <div 
@@ -643,7 +636,8 @@ function RSVPFrame({
           {/* Title */}
           <motion.div variants={childVariants}>
             <motion.h2 
-              className="text-5xl md:text-7xl font-bold mb-6 text-gray-900"
+              className="text-5xl md:text-7xl font-bold mb-6"
+              style={{ color: 'var(--template-text)' }}
               variants={childVariants}
             >
               Join Us!
@@ -659,10 +653,11 @@ function RSVPFrame({
           
           {/* Description */}
           <motion.p 
-            className="text-xl md:text-2xl text-gray-700 max-w-2xl mx-auto leading-relaxed"
+            className="text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed"
+            style={{ color: 'var(--template-text-secondary)' }}
             variants={childVariants}
           >
-            We can't wait to celebrate with you. Please let us know if you'll be joining us.
+            We can&apos;t wait to celebrate with you. Please let us know if you&apos;ll be joining us.
           </motion.p>
           
           {/* CTA Button */}
@@ -678,7 +673,14 @@ function RSVPFrame({
               <Button 
                 onClick={onRSVPClick}
                 size="lg"
-                className="px-12 py-6 text-xl font-bold bg-white text-gray-900 hover:bg-gray-50 shadow-2xl rounded-2xl"
+                className="px-12 py-6 text-xl font-bold shadow-2xl rounded-2xl"
+                style={{
+                  backgroundColor: 'var(--template-surface)',
+                  color: 'var(--template-text)',
+                  borderColor: 'var(--template-border)',
+                  borderWidth: '1px',
+                  borderStyle: 'solid'
+                }}
               >
                 RSVP Now
                 <motion.div
@@ -702,20 +704,16 @@ function RSVPFrame({
 
 function GalleryFrame({ 
   invitation, 
-  template, 
+  template,
   childVariants,
   className 
 }: { 
   invitation: Invitation; 
-  template: any; 
+  template: TemplateConfig;
   childVariants: any;
   className?: string;
 }) {
-  const defaultBackground = getDefaultBackground(
-    template.category,
-    template.design_config?.primaryColor || '#3b82f6',
-    template.design_config?.accentColor || '#f59e0b'
-  );
+  const defaultBackground = getDefaultBackground();
 
   return (
     <div 
@@ -796,7 +794,7 @@ function GalleryFrame({
                 <h2 className="text-4xl md:text-6xl font-bold mb-6" style={{ color: 'var(--template-primary)' }}>
                   Gallery
                 </h2>
-                <p className="text-xl text-gray-600">
+                <p className="text-xl" style={{ color: 'var(--template-text-secondary)' }}>
                   Memories to be made...
                 </p>
               </div>

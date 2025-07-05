@@ -13,30 +13,32 @@ interface TemplateRendererProps {
     category: string;
     design_config: TemplateDesignConfig;
   };
-  invitation: {
-    id: string;
-    title: string;
-    description?: string;
-    event_date: string;
-    location?: string;
-    image_url?: string;
-  };
   children: React.ReactNode;
   className?: string;
 }
 
 export function TemplateRenderer({ 
   template, 
-  invitation, 
   children, 
   className 
 }: TemplateRendererProps) {
-  const config = template.design_config as any;
+  const config = template.design_config as Record<string, unknown>;
   
   // Apply template-specific styling
   const templateStyles = {
+    // Core brand colors
     '--template-primary': config?.primaryColor || '#3b82f6',
     '--template-accent': config?.accentColor || '#f59e0b',
+    
+    // Comprehensive color palette
+    '--template-background': config?.backgroundColor || '#ffffff',
+    '--template-surface': config?.surfaceColor || '#f8fafc',
+    '--template-text': config?.textColor || '#1f2937',
+    '--template-text-secondary': config?.textSecondaryColor || '#6b7280',
+    '--template-border': config?.borderColor || '#e5e7eb',
+    '--template-overlay': config?.overlayColor || 'rgba(0, 0, 0, 0.5)',
+    
+    // Typography
     '--template-font': config?.fontFamily || 'sans-serif',
   } as React.CSSProperties;
 
