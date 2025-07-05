@@ -1,5 +1,5 @@
-import { InvitationCreateClient } from '@kit/invitations/invitation-create-client';
+import { InvitationCreateMultiStep } from '@kit/invitations/invitation-create-multi-step';
 
 export default function CreateInvitationPage() {
-  return <InvitationCreateClient />;
+  return <InvitationCreateMultiStep />;
 }
