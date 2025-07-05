@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence, useScroll, useSpring, useInView, Variants } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { Button } from '../shadcn/button';
@@ -40,15 +40,21 @@ export function InvitationFrames({
   className 
 }: InvitationFramesProps) {
   const [currentFrame, setCurrentFrame] = useState(0);
+  const [isClient, setIsClient] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   
-  // Framer Motion scroll tracking
+  // Ensure client-side only rendering for hydration safety
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  // Framer Motion scroll tracking - only on client
   const { scrollY } = useScroll({ container: containerRef });
   useSpring(scrollY, { stiffness: 100, damping: 30 });
 
   // Smooth scroll to frame with Framer Motion
   const scrollToFrame = useCallback((index: number) => {
-    if (containerRef.current) {
+    if (containerRef.current && isClient) {
       const frameHeight = window.innerHeight;
       const targetY = index * frameHeight;
       
@@ -78,20 +84,36 @@ export function InvitationFrames({
       
       setCurrentFrame(index);
     }
-  }, []);
+  }, [isClient]);
+
+  // Throttle function to limit scroll event frequency
+  const throttledScrollHandler = useMemo(() => {
+    let timeoutId: NodeJS.Timeout | null = null;
+    
+    return () => {
+      if (timeoutId) return;
+      
+      timeoutId = setTimeout(() => {
+        if (containerRef.current && isClient) {
+          const scrollTop = containerRef.current.scrollTop;
+          const frameHeight = window.innerHeight;
+          const newCurrentFrame = Math.round(scrollTop / frameHeight);
+          
+          // Use functional update to avoid dependency on currentFrame
+          setCurrentFrame(prevFrame => {
+            if (newCurrentFrame !== prevFrame && newCurrentFrame >= 0 && newCurrentFrame < frames.length) {
+              return newCurrentFrame;
+            }
+            return prevFrame;
+          });
+        }
+        timeoutId = null;
+      }, 50); // Throttle to 20fps for smooth performance
+    };
+  }, [frames.length, isClient]);
 
   // Update current frame based on scroll position
-  const handleScroll = useCallback(() => {
-    if (containerRef.current) {
-      const scrollTop = containerRef.current.scrollTop;
-      const frameHeight = window.innerHeight;
-      const newCurrentFrame = Math.round(scrollTop / frameHeight);
-      
-      if (newCurrentFrame !== currentFrame && newCurrentFrame >= 0 && newCurrentFrame < frames.length) {
-        setCurrentFrame(newCurrentFrame);
-      }
-    }
-  }, [currentFrame, frames.length]);
+  const handleScroll = useCallback(throttledScrollHandler, [throttledScrollHandler]);
 
   return (
     <motion.div 
@@ -101,7 +123,7 @@ export function InvitationFrames({
         scrollSnapType: 'y mandatory',
         scrollBehavior: 'smooth'
       }}
-      onScroll={handleScroll}
+      onScroll={isClient ? handleScroll : undefined}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
@@ -140,7 +162,7 @@ export function InvitationFrames({
 
       {/* Enhanced Navigation Dots */}
       <AnimatePresence>
-        {frames.length > 1 && (
+        {frames.length > 1 && isClient && (
           <motion.div 
             className="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col space-y-3 z-50"
             initial={{ opacity: 0, x: 50 }}
@@ -213,7 +235,13 @@ function InvitationFrame({
   onRSVPClick 
 }: InvitationFrameProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
   const isInView = useInView(ref, { amount: 0.3 });
+
+  // Ensure client-side only rendering for hydration safety
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const frameVariants = {
     hidden: { opacity: 0, y: 60, scale: 0.95 },
@@ -249,8 +277,8 @@ function InvitationFrame({
           ref={ref}
           className="relative isolate w-full h-full min-h-screen"
           variants={frameVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          initial={isClient ? "hidden" : "visible"}
+          animate={isClient && isInView ? "visible" : "visible"}
         >
           <HeroFrame 
             invitation={invitation}
@@ -266,8 +294,8 @@ function InvitationFrame({
           ref={ref}
           className="relative isolate w-full h-full min-h-screen"
           variants={frameVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          initial={isClient ? "hidden" : "visible"}
+          animate={isClient && isInView ? "visible" : "visible"}
         >
           <DetailsFrame 
             invitation={invitation}
@@ -283,8 +311,8 @@ function InvitationFrame({
           ref={ref}
           className="relative isolate w-full h-full min-h-screen"
           variants={frameVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          initial={isClient ? "hidden" : "visible"}
+          animate={isClient && isInView ? "visible" : "visible"}
         >
           <RSVPFrame 
             invitation={invitation}
@@ -301,8 +329,8 @@ function InvitationFrame({
           ref={ref}
           className="relative isolate w-full h-full min-h-screen"
           variants={frameVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          initial={isClient ? "hidden" : "visible"}
+          animate={isClient && isInView ? "visible" : "visible"}
         >
           <GalleryFrame 
             invitation={invitation}
@@ -322,6 +350,121 @@ function getDefaultBackground() {
   return 'var(--template-background)';
 }
 
+// Particle system component for enhanced visual effects
+function ParticleSystem({ count = 20, template: _template }: { count?: number; template: TemplateConfig }) {
+  const [particles, setParticles] = useState<Array<{
+    id: number;
+    size: number;
+    x: number;
+    y: number;
+    delay: number;
+    duration: number;
+  }>>([]);
+
+  // Generate particles only on client side to avoid hydration mismatch
+  useEffect(() => {
+    const newParticles = Array.from({ length: count }, (_, i) => ({
+      id: i,
+      size: Math.random() * 6 + 2,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
+      delay: Math.random() * 12,
+      duration: Math.random() * 8 + 8,
+    }));
+    setParticles(newParticles);
+  }, [count]);
+
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {particles.map((particle) => (
+        <motion.div
+          key={particle.id}
+          className="absolute rounded-full particle"
+          style={{
+            width: particle.size,
+            height: particle.size,
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            backgroundColor: 'var(--template-primary)',
+            opacity: 0.3,
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.6] }}
+          transition={{
+            duration: particle.duration,
+            delay: particle.delay,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: 'easeInOut',
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Enhanced floating decoration component
+function FloatingDecorations({ template: _template }: { template: TemplateConfig }) {
+  return (
+    <>
+      {/* Luxury floating elements */}
+      <motion.div 
+        className="absolute top-10 right-10 w-32 h-32 rounded-full floating-element opacity-20"
+        style={{ 
+          background: `linear-gradient(135deg, var(--template-primary), var(--template-accent))`,
+          filter: 'blur(20px)'
+        }}
+      />
+      <motion.div 
+        className="absolute bottom-20 left-10 w-24 h-24 rounded-full floating-element-reverse opacity-30"
+        style={{ 
+          background: `linear-gradient(45deg, var(--template-accent), var(--template-primary))`,
+          filter: 'blur(15px)'
+        }}
+      />
+      
+      {/* Morphing shapes */}
+      <motion.div 
+        className="absolute top-1/4 left-5 w-20 h-20 morphing-shape opacity-10"
+        style={{ 
+          background: 'var(--template-primary)',
+          filter: 'blur(25px)'
+        }}
+        animate={{
+          scale: [1, 1.2],
+          rotate: [0, 360],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: 'easeInOut',
+        }}
+      />
+      
+      {/* Geometric accents */}
+      <motion.div 
+        className="absolute bottom-1/3 right-8 w-16 h-16 opacity-15"
+        style={{ 
+          background: `conic-gradient(from 0deg, var(--template-primary), var(--template-accent), var(--template-primary))`,
+          clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+          filter: 'blur(10px)'
+        }}
+        animate={{
+          rotate: [0, 360],
+          scale: [1, 1.5],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: 'linear',
+        }}
+      />
+    </>
+  );
+}
+
 // Individual Frame Components with Framer Motion
 function HeroFrame({ 
   invitation, 
@@ -338,23 +481,27 @@ function HeroFrame({
 
   return (
     <div 
-      className={cn('hero-frame min-h-screen w-full flex items-center justify-center relative', className)}
+      className={cn('hero-frame min-h-screen w-full flex items-center justify-center relative dynamic-background', className)}
       style={{ background: defaultBackground }}
     >
+      {/* Particle System */}
+      <ParticleSystem template={template} count={15} />
       
-      {/* Content */}
+      {/* Enhanced Floating Decorations */}
+      <FloatingDecorations template={template} />
+      
+      {/* Content with glassmorphism effect */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
         <motion.div className="space-y-8" variants={childVariants}>
           <motion.div variants={childVariants}>
             <Badge 
               variant="outline" 
               className={cn(
-                "text-sm px-6 py-2 border-0 shadow-lg backdrop-blur-sm",
-                invitation.image_url ? "bg-white/80" : ""
+                "text-sm px-6 py-3 border-0 shadow-lg glass-effect hover-lift transition-all duration-300",
+                invitation.image_url ? "glass-effect-dark" : "glass-effect"
               )}
               style={{ 
                 color: 'var(--template-primary)',
-                backgroundColor: invitation.image_url ? 'rgba(255, 255, 255, 0.8)' : 'var(--template-surface)'
               }}
             >
               {template.category.charAt(0).toUpperCase() + template.category.slice(1).replace('_', ' ')}
@@ -363,63 +510,102 @@ function HeroFrame({
           
           <motion.h1 
             className={cn(
-              "text-5xl md:text-7xl lg:text-8xl font-bold leading-tight break-words",
-              invitation.image_url ? "text-white drop-shadow-2xl" : ""
+              "text-5xl md:text-7xl lg:text-9xl font-bold leading-tight break-words typography-luxury",
+              invitation.image_url ? "text-white drop-shadow-2xl" : "",
+              "hover:scale-105 transition-transform duration-500"
             )}
             style={{ 
-              color: invitation.image_url ? 'white' : 'var(--template-text)'
+              color: invitation.image_url ? 'white' : 'var(--template-text)',
+              textShadow: invitation.image_url ? '0 4px 20px rgba(0,0,0,0.5)' : 'none'
             }}
             variants={childVariants}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             {invitation.title}
           </motion.h1>
           
           <AnimatePresence>
             {invitation.description && (
-              <motion.p 
-                className={cn(
-                  "text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed",
-                  invitation.image_url ? "text-white/90 drop-shadow-lg" : ""
-                )}
-                style={{ 
-                  color: invitation.image_url ? 'rgba(255, 255, 255, 0.9)' : 'var(--template-text-secondary)'
-                }}
+              <motion.div
+                className="relative"
                 variants={childVariants}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
               >
-                {invitation.description}
-              </motion.p>
+                <motion.p 
+                  className={cn(
+                    "text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed premium-card p-6",
+                    invitation.image_url ? "glass-effect-dark text-white/90" : "glass-effect"
+                  )}
+                  style={{ 
+                    color: invitation.image_url ? 'rgba(255, 255, 255, 0.9)' : 'var(--template-text-secondary)'
+                  }}
+                  whileHover={{ y: -2 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                >
+                  {invitation.description}
+                </motion.p>
+              </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Call to Action Enhancement */}
+          <motion.div 
+            className="pt-4"
+            variants={childVariants}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, delay: 1.2 }}
+          >
+            <motion.div
+              className="inline-flex items-center space-x-3 px-8 py-4 glass-effect rounded-full cursor-pointer hover-lift"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+            >
+              <motion.div
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: 'var(--template-primary)' }}
+                animate={{ 
+                  scale: [1, 1.5],
+                  opacity: [0.7, 1]
+                }}
+                transition={{ 
+                  duration: 2,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                  ease: 'easeInOut'
+                }}
+              />
+              <span 
+                className="text-lg font-medium"
+                style={{ color: 'var(--template-text)' }}
+              >
+                Scroll to explore
+              </span>
+            </motion.div>
+          </motion.div>
         </motion.div>
       </div>
       
-      {/* Floating Decorative Elements */}
+      {/* Enhanced Background Elements */}
       <motion.div 
-        className="absolute top-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"
-        animate={{ 
-          y: [0, -20, 0],
-          x: [0, 10, 0]
+        className="absolute inset-0 opacity-30 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle at 20% 30%, var(--template-primary)20, transparent 70%),
+                       radial-gradient(circle at 80% 70%, var(--template-accent)15, transparent 60%)`
         }}
-        transition={{ 
-          duration: 6,
+        animate={{
+          scale: [1, 1.1],
+          opacity: [0.3, 0.5],
+        }}
+        transition={{
+          duration: 12,
           repeat: Infinity,
-          ease: 'easeInOut'
-        }}
-      />
-      <motion.div 
-        className="absolute bottom-20 left-10 w-24 h-24 bg-white/10 rounded-full blur-xl"
-        animate={{ 
-          y: [0, 15, 0],
-          x: [0, -8, 0]
-        }}
-        transition={{ 
-          duration: 4,
-          repeat: Infinity,
+          repeatType: "reverse",
           ease: 'easeInOut',
-          delay: 2
         }}
       />
     </div>
@@ -428,7 +614,7 @@ function HeroFrame({
 
 function DetailsFrame({ 
   invitation, 
-  template: _template,
+  template,
   childVariants,
   className 
 }: { 
@@ -441,27 +627,34 @@ function DetailsFrame({
 
   return (
     <div 
-      className={cn('details-frame min-h-screen w-full flex items-center justify-center relative', className)}
+      className={cn('details-frame min-h-screen w-full flex items-center justify-center relative dynamic-background', className)}
       style={{ background: defaultBackground }}
     >
+      {/* Enhanced Particle System */}
+      <ParticleSystem template={template} count={12} />
+      
+      {/* Floating Decorations */}
+      <FloatingDecorations template={template} />
       
       {/* Content */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto px-6">
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6">
         <motion.div className="text-center mb-16" variants={childVariants}>
           <motion.h2 
-            className="text-4xl md:text-6xl font-bold mb-6" 
+            className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 typography-luxury" 
             style={{ color: 'var(--template-primary)' }}
             variants={childVariants}
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
             Event Details
           </motion.h2>
           <motion.div 
-            className="w-24 h-1 mx-auto rounded-full" 
+            className="w-32 h-2 mx-auto rounded-full shadow-lg" 
             style={{ backgroundColor: 'var(--template-accent)' }}
             variants={childVariants}
-            initial={{ width: 0 }}
-            animate={{ width: 96 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 128, opacity: 1 }}
+            transition={{ duration: 1, delay: 0.5 }}
           />
         </motion.div>
         
@@ -469,36 +662,45 @@ function DetailsFrame({
           <AnimatePresence>
             {invitation.event_date && (
               <motion.div 
-                className="backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl"
-                style={{
-                  backgroundColor: 'var(--template-surface)',
-                  borderColor: 'var(--template-border)',
-                  borderWidth: '1px',
-                  borderStyle: 'solid'
-                }}
+                className="premium-card hover-lift p-8 md:p-12"
                 variants={childVariants}
-                whileHover={{ scale: 1.02, y: -5 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
               >
                 <div className="flex items-start space-x-6">
                   <motion.div 
-                    className="p-4 rounded-2xl"
-                    style={{ backgroundColor: 'var(--template-primary)15' }}
-                    whileHover={{ scale: 1.1 }}
+                    className="p-5 rounded-3xl glass-effect"
+                    style={{ backgroundColor: 'var(--template-primary)20' }}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   >
-                    <Calendar className="w-8 h-8" style={{ color: 'var(--template-primary)' }} />
+                    <Calendar className="w-10 h-10" style={{ color: 'var(--template-primary)' }} />
                   </motion.div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--template-text)' }}>Date & Time</h3>
-                    <p className="text-xl leading-relaxed" style={{ color: 'var(--template-text-secondary)' }}>
+                    <motion.h3 
+                      className="text-3xl font-bold mb-4 typography-modern" 
+                      style={{ color: 'var(--template-text)' }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.5 }}
+                    >
+                      Date & Time
+                    </motion.h3>
+                    <motion.p 
+                      className="text-xl md:text-2xl leading-relaxed" 
+                      style={{ color: 'var(--template-text-secondary)' }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.7 }}
+                    >
                       {new Date(invitation.event_date).toLocaleDateString('en-US', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric',
                       })}
-                    </p>
+                    </motion.p>
                   </div>
                 </div>
               </motion.div>
@@ -508,29 +710,40 @@ function DetailsFrame({
           <AnimatePresence>
             {invitation.location && (
               <motion.div 
-                className="backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl"
-                style={{
-                  backgroundColor: 'var(--template-surface)',
-                  borderColor: 'var(--template-border)',
-                  borderWidth: '1px',
-                  borderStyle: 'solid'
-                }}
+                className="premium-card hover-lift p-8 md:p-12"
                 variants={childVariants}
-                whileHover={{ scale: 1.02, y: -5 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
               >
                 <div className="flex items-start space-x-6">
                   <motion.div 
-                    className="p-4 rounded-2xl"
-                    style={{ backgroundColor: 'var(--template-accent)15' }}
-                    whileHover={{ scale: 1.1 }}
+                    className="p-5 rounded-3xl glass-effect"
+                    style={{ backgroundColor: 'var(--template-accent)20' }}
+                    whileHover={{ scale: 1.1, rotate: -5 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                   >
-                    <MapPin className="w-8 h-8" style={{ color: 'var(--template-accent)' }} />
+                    <MapPin className="w-10 h-10" style={{ color: 'var(--template-accent)' }} />
                   </motion.div>
                   <div className="flex-1">
-                    <h3 className="text-2xl font-bold mb-3" style={{ color: 'var(--template-text)' }}>Location</h3>
-                    <p className="text-xl leading-relaxed" style={{ color: 'var(--template-text-secondary)' }}>{invitation.location}</p>
+                    <motion.h3 
+                      className="text-3xl font-bold mb-4 typography-modern" 
+                      style={{ color: 'var(--template-text)' }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.7 }}
+                    >
+                      Location
+                    </motion.h3>
+                    <motion.p 
+                      className="text-xl md:text-2xl leading-relaxed" 
+                      style={{ color: 'var(--template-text-secondary)' }}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, delay: 0.9 }}
+                    >
+                      {invitation.location}
+                    </motion.p>
                   </div>
                 </div>
               </motion.div>
@@ -539,32 +752,20 @@ function DetailsFrame({
         </motion.div>
       </div>
       
-      {/* Floating Background Elements */}
+      {/* Enhanced Background Elements */}
       <motion.div 
-        className="absolute top-20 left-10 w-40 h-40 bg-gradient-to-br from-blue-200/30 to-purple-200/30 rounded-full blur-2xl"
-        animate={{ 
-          y: [0, -30, 0],
-          x: [0, 20, 0],
-          rotate: [0, 180, 360]
+        className="absolute inset-0 opacity-20 pointer-events-none"
+        style={{
+          background: `conic-gradient(from 180deg at 30% 20%, var(--template-primary)10, transparent 50%),
+                       conic-gradient(from 0deg at 70% 80%, var(--template-accent)10, transparent 50%)`
         }}
-        transition={{ 
-          duration: 8,
+        animate={{
+          rotate: [0, 360],
+        }}
+        transition={{
+          duration: 30,
           repeat: Infinity,
-          ease: 'easeInOut'
-        }}
-      />
-      <motion.div 
-        className="absolute bottom-20 right-10 w-32 h-32 bg-gradient-to-br from-pink-200/30 to-rose-200/30 rounded-full blur-2xl"
-        animate={{ 
-          y: [0, 25, 0],
-          x: [0, -15, 0],
-          rotate: [0, -180, -360]
-        }}
-        transition={{ 
-          duration: 6,
-          repeat: Infinity,
-          ease: 'easeInOut',
-          delay: 1
+          ease: 'linear',
         }}
       />
     </div>
@@ -573,7 +774,7 @@ function DetailsFrame({
 
 function RSVPFrame({ 
   invitation: _invitation,
-  template: _template,
+  template,
   childVariants,
   onRSVPClick, 
   className 
@@ -588,116 +789,204 @@ function RSVPFrame({
 
   return (
     <div 
-      className={cn('rsvp-frame min-h-screen w-full flex items-center justify-center relative', className)}
+      className={cn('rsvp-frame min-h-screen w-full flex items-center justify-center relative dynamic-background', className)}
       style={{ background: defaultBackground }}
     >
+      {/* Enhanced Particle System */}
+      <ParticleSystem template={template} count={25} />
+      
+      {/* Floating Decorations */}
+      <FloatingDecorations template={template} />
       
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
         <motion.div className="space-y-12" variants={childVariants}>
-          {/* Icon */}
+          {/* Enhanced Icon with Glassmorphism */}
           <motion.div 
             className="relative"
             variants={childVariants}
           >
             <motion.div 
-              className="w-32 h-32 mx-auto rounded-full flex items-center justify-center"
-              style={{ backgroundColor: 'var(--template-primary)' }}
-              whileHover={{ scale: 1.1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            >
-              <Heart className="w-16 h-16 text-white" />
-            </motion.div>
-            <motion.div 
-              className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center"
-              animate={{ 
-                scale: [1, 1.2, 1],
-                rotate: [0, 180, 360]
+              className="w-40 h-40 mx-auto rounded-full flex items-center justify-center glass-effect shadow-2xl"
+              style={{ 
+                background: `linear-gradient(135deg, var(--template-primary), var(--template-accent))`,
+                boxShadow: `0 20px 60px var(--template-primary)30`
               }}
-              transition={{ 
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              animate={{
+                boxShadow: [
+                  `0 20px 60px var(--template-primary)30`,
+                  `0 25px 80px var(--template-primary)40`
+                ]
+              }}
+              transition={{
                 duration: 2,
                 repeat: Infinity,
+                repeatType: "reverse",
+                ease: "easeInOut"
+              }}
+            >
+              <Heart className="w-20 h-20 text-white drop-shadow-lg" />
+            </motion.div>
+            
+            {/* Floating accent elements */}
+            <motion.div 
+              className="absolute -top-4 -right-4 w-12 h-12 glass-effect rounded-full flex items-center justify-center"
+              animate={{ 
+                scale: [1, 1.3],
+                rotate: [0, 360]
+              }}
+              transition={{ 
+                duration: 3,
+                repeat: Infinity,
+                repeatType: "reverse",
                 ease: 'easeInOut'
               }}
             >
               <motion.div 
-                className="w-4 h-4 rounded-full"
+                className="w-6 h-6 rounded-full"
                 style={{ backgroundColor: 'var(--template-accent)' }}
-                animate={{ opacity: [0.5, 1, 0.5] }}
+                animate={{ 
+                  opacity: [0.7, 1],
+                  scale: [0.8, 1.2]
+                }}
                 transition={{ 
-                  duration: 1,
+                  duration: 2,
                   repeat: Infinity,
+                  repeatType: "reverse",
                   ease: 'easeInOut'
                 }}
               />
             </motion.div>
+            
+            {/* Pulsing rings */}
+            <motion.div 
+              className="absolute inset-0 w-40 h-40 mx-auto rounded-full border-4 opacity-30"
+              style={{ borderColor: 'var(--template-primary)' }}
+              animate={{ 
+                scale: [1, 1.5],
+                opacity: [0.3, 0]
+              }}
+              transition={{ 
+                duration: 2,
+                repeat: Infinity,
+                repeatType: "reverse",
+                ease: 'easeInOut'
+              }}
+            />
           </motion.div>
           
-          {/* Title */}
+          {/* Enhanced Title */}
           <motion.div variants={childVariants}>
             <motion.h2 
-              className="text-5xl md:text-7xl font-bold mb-6"
-              style={{ color: 'var(--template-text)' }}
+              className="text-6xl md:text-8xl lg:text-9xl font-bold mb-8 typography-luxury"
+              style={{ 
+                color: 'var(--template-text)',
+                textShadow: '0 4px 20px rgba(0,0,0,0.1)'
+              }}
               variants={childVariants}
+              whileHover={{ scale: 1.02 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
             >
               Join Us!
             </motion.h2>
             <motion.div 
-              className="w-32 h-1 mx-auto rounded-full" 
+              className="w-40 h-2 mx-auto rounded-full shadow-lg" 
               style={{ backgroundColor: 'var(--template-accent)' }}
-              initial={{ width: 0 }}
-              animate={{ width: 128 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 160, opacity: 1 }}
+              transition={{ duration: 1, delay: 0.5 }}
             />
           </motion.div>
           
-          {/* Description */}
-          <motion.p 
-            className="text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed"
-            style={{ color: 'var(--template-text-secondary)' }}
+          {/* Enhanced Description */}
+          <motion.div
+            className="premium-card p-8 max-w-3xl mx-auto"
             variants={childVariants}
+            whileHover={{ y: -2 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
           >
-            We can&apos;t wait to celebrate with you. Please let us know if you&apos;ll be joining us.
-          </motion.p>
+            <motion.p 
+              className="text-xl md:text-2xl leading-relaxed typography-modern"
+              style={{ color: 'var(--template-text-secondary)' }}
+              variants={childVariants}
+            >
+              We can&apos;t wait to celebrate with you. Please let us know if you&apos;ll be joining us for this special moment.
+            </motion.p>
+          </motion.div>
           
-          {/* CTA Button */}
+          {/* Enhanced CTA Button */}
           <motion.div 
             className="pt-8"
             variants={childVariants}
           >
             <motion.div
-              whileHover={{ scale: 1.05 }}
+              whileHover={{ scale: 1.05, y: -3 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
               <Button 
                 onClick={onRSVPClick}
                 size="lg"
-                className="px-12 py-6 text-xl font-bold shadow-2xl rounded-2xl"
+                className="px-16 py-8 text-2xl font-bold shadow-2xl rounded-3xl premium-card typography-modern"
                 style={{
-                  backgroundColor: 'var(--template-surface)',
-                  color: 'var(--template-text)',
-                  borderColor: 'var(--template-border)',
-                  borderWidth: '1px',
-                  borderStyle: 'solid'
+                  background: `linear-gradient(135deg, var(--template-primary), var(--template-accent))`,
+                  color: 'white',
+                  border: 'none'
                 }}
               >
-                RSVP Now
-                <motion.div
-                  animate={{ x: [0, 5, 0] }}
+                <motion.span
+                  animate={{ 
+                    textShadow: [
+                      '0 0 0 rgba(255,255,255,0)',
+                      '0 0 20px rgba(255,255,255,0.5)',
+                      '0 0 0 rgba(255,255,255,0)'
+                    ]
+                  }}
                   transition={{ 
-                    duration: 1.5,
+                    duration: 2,
                     repeat: Infinity,
                     ease: 'easeInOut'
                   }}
                 >
-                  <Heart className="w-6 h-6 ml-3" style={{ color: 'var(--template-primary)' }} />
+                  RSVP Now
+                </motion.span>
+                <motion.div
+                  animate={{ x: [0, 8] }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "reverse",
+                    ease: 'easeInOut'
+                  }}
+                >
+                  <Heart className="w-8 h-8 ml-4 drop-shadow-lg" />
                 </motion.div>
               </Button>
             </motion.div>
           </motion.div>
         </motion.div>
       </div>
+      
+      {/* Enhanced Background Effects */}
+      <motion.div 
+        className="absolute inset-0 opacity-15 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle at 10% 20%, var(--template-primary)25, transparent 60%),
+                       radial-gradient(circle at 90% 80%, var(--template-accent)20, transparent 50%),
+                       radial-gradient(circle at 50% 50%, var(--template-primary)10, transparent 70%)`
+        }}
+        animate={{
+          scale: [1, 1.2],
+          opacity: [0.15, 0.25],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          repeatType: "reverse",
+          ease: 'easeInOut',
+        }}
+      />
     </div>
   );
 }
