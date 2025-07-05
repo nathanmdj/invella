@@ -19,7 +19,7 @@ const routes = [
       },
       {
         label: 'Create Invitation',
-        path: '/create',
+        path: '/home/create',
         Icon: <Plus className={iconClasses} />,
       },
     ],

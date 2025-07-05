@@ -21,7 +21,7 @@ export default async function HomePage() {
         description="Manage your events and track RSVPs"
       >
         <Button asChild size="lg">
-          <Link href="/create">
+          <Link href="/home/create">
             <Plus className="h-5 w-5 mr-2" />
             Create Invitation
           </Link>
