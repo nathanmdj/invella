@@ -34,7 +34,7 @@ export function InvitationCreateMultiStep() {
     resetForm,
   } = useInvitationCreateStore();
 
-  const form = useForm<CreateInvitation>({
+  const form = useForm({
     resolver: zodResolver(CreateInvitationSchema),
     defaultValues: {
       title: '',
@@ -42,7 +42,7 @@ export function InvitationCreateMultiStep() {
       location: '',
       image_url: '',
       max_guests: undefined,
-      custom_fields: undefined,
+      custom_fields: {},
       event_date: undefined,
       rsvp_deadline: undefined,
       ...formData,
@@ -62,7 +62,7 @@ export function InvitationCreateMultiStep() {
       location: formData.location || '',
       image_url: formData.image_url || '',
       max_guests: formData.max_guests || undefined,
-      custom_fields: formData.custom_fields || undefined,
+      custom_fields: formData.custom_fields || {},
       event_date: formData.event_date || undefined,
       rsvp_deadline: formData.rsvp_deadline || undefined,
     });

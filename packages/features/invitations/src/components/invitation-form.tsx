@@ -38,7 +38,7 @@ export function InvitationForm({
     initialData?.rsvp_deadline || undefined
   );
 
-  const form = useForm<CreateInvitation>({
+  const form = useForm({
     resolver: zodResolver(CreateInvitationSchema),
     defaultValues: {
       title: initialData?.title || '',
@@ -46,7 +46,7 @@ export function InvitationForm({
       location: initialData?.location || '',
       image_url: initialData?.image_url || '',
       max_guests: initialData?.max_guests || undefined,
-      custom_fields: initialData?.custom_fields || undefined,
+      custom_fields: initialData?.custom_fields || {},
       event_date: initialData?.event_date || undefined,
       rsvp_deadline: initialData?.rsvp_deadline || undefined,
     },
