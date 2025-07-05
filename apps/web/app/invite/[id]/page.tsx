@@ -15,21 +15,21 @@ interface InvitationPageProps {
 }
 
 async function InvitationContent({ invitationId }: { invitationId: string }) {
-  // Fetch data using server actions
-  const [invitation, template] = await Promise.all([
-    getPublicInvitation(invitationId),
-    getTemplateData()
-  ]);
+  // Fetch invitation data first
+  const invitation = await getPublicInvitation(invitationId);
 
   if (!invitation) {
     return <InvitationError />;
   }
 
+  // Fetch template data using the template ID from the invitation
+  const template = await getTemplateData(invitation.template_id);
+
   // Get frames based on template category using server-side function
   const frames = getDefaultFrames(template.category);
 
   return (
-    <div className="min-h-screen w-full">
+    <div className="fixed inset-0 w-full h-full overflow-hidden">
       <TemplateRenderer 
         template={template}
         invitation={{
@@ -47,7 +47,7 @@ async function InvitationContent({ invitationId }: { invitationId: string }) {
           invitation={invitation}
           template={template}
           frames={frames}
-          className="w-full"
+          className="w-full h-full"
         />
 
         {/* Interactive Components (Client-side) */}
