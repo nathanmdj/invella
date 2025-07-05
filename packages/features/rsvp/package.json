@@ -13,7 +13,7 @@
     "./rsvp-lookup": "./src/components/rsvp-lookup.tsx",
     "./rsvp-confirmation": "./src/components/rsvp-confirmation.tsx",
     "./components": "./src/components/index.ts",
-    "./hooks/*": "./src/hooks/*.ts",
+    "./hooks/use-rsvp-data": "./src/hooks/use-rsvp-data.ts",
     "./schema/*": "./src/schema/*.ts"
   },
   "dependencies": {
