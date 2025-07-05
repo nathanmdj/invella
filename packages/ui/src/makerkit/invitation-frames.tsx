@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence, useScroll, useSpring, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring, useInView, Variants } from 'framer-motion';
 import { cn } from '../lib/utils';
 import { Button } from '../shadcn/button';
 import { Badge } from '../shadcn/badge';
@@ -331,7 +331,7 @@ function HeroFrame({
 }: { 
   invitation: Invitation; 
   template: TemplateConfig;
-  childVariants: any;
+  childVariants: Variants;
   className?: string;
 }) {
   const defaultBackground = getDefaultBackground();
@@ -428,13 +428,13 @@ function HeroFrame({
 
 function DetailsFrame({ 
   invitation, 
-  template,
+  template: _template,
   childVariants,
   className 
 }: { 
   invitation: Invitation; 
   template: TemplateConfig;
-  childVariants: any;
+  childVariants: Variants;
   className?: string;
 }) {
   const defaultBackground = getDefaultBackground();
@@ -572,15 +572,15 @@ function DetailsFrame({
 }
 
 function RSVPFrame({ 
-  invitation,
-  template,
+  invitation: _invitation,
+  template: _template,
   childVariants,
   onRSVPClick, 
   className 
 }: { 
   invitation: Invitation;
   template: TemplateConfig;
-  childVariants: any;
+  childVariants: Variants;
   onRSVPClick?: () => void;
   className?: string;
 }) {
@@ -704,13 +704,13 @@ function RSVPFrame({
 
 function GalleryFrame({ 
   invitation, 
-  template,
-  childVariants,
+  template: _template,
+  childVariants: _childVariants,
   className 
 }: { 
   invitation: Invitation; 
   template: TemplateConfig;
-  childVariants: any;
+  childVariants: Variants;
   className?: string;
 }) {
   const defaultBackground = getDefaultBackground();
