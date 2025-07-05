@@ -14,6 +14,7 @@
     "./invitation-list": "./src/components/invitation-list.tsx",
     "./invitation-list-client": "./src/components/invitation-list-client.tsx",
     "./invitation-create-client": "./src/components/invitation-create-client.tsx",
+    "./invitation-create-multi-step": "./src/components/invitation-create-multi-step.tsx",
     "./template-selector": "./src/components/template-selector.tsx",
     "./share-invitation": "./src/components/share-invitation.tsx",
     "./guest-list": "./src/components/guest-list.tsx",
@@ -27,12 +28,14 @@
     "./hooks/use-guest-data": "./src/hooks/use-guest-data.ts",
     "./hooks/use-invitation-data": "./src/hooks/use-invitation-data.ts",
     "./schema/guest.schema": "./src/schema/guest.schema.ts",
-    "./schema/invitation.schema": "./src/schema/invitation.schema.ts"
+    "./schema/invitation.schema": "./src/schema/invitation.schema.ts",
+    "./store/invitation-create-store": "./src/store/invitation-create-store.ts"
   },
   "dependencies": {
     "@kit/shared": "workspace:*",
     "@kit/supabase": "workspace:*",
-    "@kit/ui": "workspace:*"
+    "@kit/ui": "workspace:*",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
     "@kit/eslint-config": "workspace:*",
