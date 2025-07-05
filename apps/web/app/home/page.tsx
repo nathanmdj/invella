@@ -1,39 +1,13 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
-import { InvitationList } from '@kit/invitations/invitation-list';
-import { useInvitations } from '@kit/invitations/hooks/use-invitation-data';
 import { Button } from '@kit/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { PageBody, PageHeader } from '@kit/ui/page';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import type { InvitationWithStats } from '@kit/invitations/schema/invitation.schema';
+import { getUserInvitations } from '@kit/invitations/server/actions';
+import { InvitationListClient } from '@kit/invitations/invitation-list-client';
 
-export default function HomePage() {
-  const router = useRouter();
-  const { data: invitations } = useInvitations({ limit: 10 });
-
-  const handleCreateNew = () => {
-    router.push('/create');
-  };
-
-  const handleClick = (invitation: InvitationWithStats) => {
-    router.push(`/home/invitations/${invitation.id}`);
-  };
-
-  const handleEdit = (invitation: InvitationWithStats) => {
-    router.push(`/home/invitations/${invitation.id}`);
-  };
-
-  const handleViewGuests = (invitation: InvitationWithStats) => {
-    router.push(`/home/invitations/${invitation.id}/guests`);
-  };
-
-  const handleShare = (invitation: InvitationWithStats) => {
-    // For now, just navigate to the invitation details
-    router.push(`/home/invitations/${invitation.id}`);
-  };
+export default async function HomePage() {
+  const invitations = await getUserInvitations({ limit: 10 });
 
   // Calculate stats from real data
   const totalInvitations = invitations?.length || 0;
@@ -89,12 +63,8 @@ export default function HomePage() {
             <CardTitle>Recent Invitations</CardTitle>
           </CardHeader>
           <CardContent>
-            <InvitationList 
-              onCreateNew={handleCreateNew}
-              onClick={handleClick}
-              onEdit={handleEdit}
-              onViewGuests={handleViewGuests}
-              onShare={handleShare}
+            <InvitationListClient 
+              initialInvitations={invitations}
             />
           </CardContent>
         </Card>
