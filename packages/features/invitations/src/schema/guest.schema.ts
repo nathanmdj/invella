@@ -6,7 +6,7 @@ export const CreateGuestSchema = z.object({
   email: z.string().email('Invalid email address').optional().or(z.literal('')),
   phone: z.string().max(50, 'Phone number is too long').optional().or(z.literal('')),
   invitation_id: z.string().uuid(),
-  plus_one_allowed: z.boolean().default(false),
+  plus_one_allowed: z.boolean(),
 });
 
 // Schema for bulk guest import
