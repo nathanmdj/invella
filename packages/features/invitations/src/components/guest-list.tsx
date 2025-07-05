@@ -32,7 +32,7 @@ import {
 } from '@kit/ui/dropdown-menu';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Skeleton } from '@kit/ui/skeleton';
-import { EmptyState } from '@kit/ui/empty-state';
+import { EmptyState, EmptyStateHeading, EmptyStateText, EmptyStateButton } from '@kit/ui/empty-state';
 
 import { useGuests } from '../hooks/use-guest-data';
 import type { GuestWithRSVP } from '../schema/guest.schema';
@@ -190,23 +190,25 @@ export function GuestList({
           ))}
         </div>
       ) : !filteredGuests || filteredGuests.length === 0 ? (
-        <EmptyState
-          icon={<Users className="h-12 w-12 text-muted-foreground" />}
-          title={searchQuery ? "No guests found" : "No guests yet"}
-          description={
-            searchQuery
+        <EmptyState>
+          <div className="flex justify-center mb-4">
+            <Users className="h-12 w-12 text-muted-foreground" />
+          </div>
+          <EmptyStateHeading>
+            {searchQuery ? "No guests found" : "No guests yet"}
+          </EmptyStateHeading>
+          <EmptyStateText>
+            {searchQuery
               ? "Try adjusting your search criteria"
-              : "Add guests to start collecting RSVPs"
-          }
-          action={
-            onAddGuest && !searchQuery ? (
-              <Button onClick={onAddGuest}>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Add Your First Guest
-              </Button>
-            ) : undefined
-          }
-        />
+              : "Add guests to start collecting RSVPs"}
+          </EmptyStateText>
+          {onAddGuest && !searchQuery && (
+            <EmptyStateButton onClick={onAddGuest}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add Your First Guest
+            </EmptyStateButton>
+          )}
+        </EmptyState>
       ) : (
         <Card>
           <Table>
