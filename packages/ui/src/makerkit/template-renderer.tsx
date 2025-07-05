@@ -41,7 +41,7 @@ export function TemplateRenderer({
   } as React.CSSProperties;
 
   const templateClasses = cn(
-    'template-renderer w-full h-full overflow-hidden',
+    'template-renderer w-full h-full',
     `template-${template.category}`,
     `layout-${config?.layout || 'classic'}`,
     config?.fontFamily === 'serif' ? 'font-serif' : 'font-sans',
