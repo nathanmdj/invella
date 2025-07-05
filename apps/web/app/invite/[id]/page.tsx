@@ -2,7 +2,6 @@
 import { Suspense } from 'react';
 import { getPublicInvitation, getTemplateData } from '@kit/invitations/server/actions';
 import { getDefaultFrames } from '@kit/invitations/server/utils';
-import { InvitationInteractive } from '@kit/invitations/invitation-interactive';
 import { InvitationLoading } from '@kit/invitations/invitation-loading';
 import { InvitationError } from '@kit/invitations/invitation-error';
 import { InvitationFramesWrapper } from '@kit/invitations/invitation-frames-wrapper';
@@ -32,14 +31,6 @@ async function InvitationContent({ invitationId }: { invitationId: string }) {
     <div className="fixed inset-0 w-full h-full overflow-hidden">
       <TemplateRenderer 
         template={template}
-        invitation={{
-          id: invitation.id,
-          title: invitation.title,
-          description: invitation.description || undefined,
-          event_date: invitation.event_date || '',
-          location: invitation.location || undefined,
-          image_url: invitation.image_url || undefined,
-        }}
         className="w-full h-full"
       >
         {/* Full-Screen Template Gallery Frames */}

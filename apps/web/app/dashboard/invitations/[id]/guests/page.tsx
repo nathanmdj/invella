@@ -6,7 +6,6 @@ import { GuestList } from '@kit/invitations/guest-list';
 import { GuestForm } from '@kit/invitations/guest-form';
 import { Card, CardContent, CardHeader, CardTitle } from '@kit/ui/card';
 import { Button } from '@kit/ui/button';
-import { Input } from '@kit/ui/input';
 import { 
   Dialog,
   DialogContent,
@@ -17,7 +16,6 @@ import {
 import { 
   Plus, 
   Upload,
-  Search 
 } from 'lucide-react';
 import Link from 'next/link';
 import { useCreateGuest } from '@kit/invitations/hooks/use-guest-data';
