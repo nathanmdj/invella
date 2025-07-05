@@ -34,9 +34,17 @@
     "./store/invitation-create-store": "./src/store/invitation-create-store.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.0.1",
     "@kit/shared": "workspace:*",
     "@kit/supabase": "workspace:*",
     "@kit/ui": "workspace:*",
+    "@tanstack/react-query": "5.77.2",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.23.0",
+    "lucide-react": "^0.511.0",
+    "react-hook-form": "^7.56.4",
+    "sonner": "^1.7.4",
+    "zod": "^3.25.32",
     "zustand": "^4.4.1"
   },
   "devDependencies": {
