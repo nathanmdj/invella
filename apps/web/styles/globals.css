@@ -198,4 +198,489 @@
       animation: none;
     }
   }
+
+  /* Modern Visual Effects for Viral-Worthy Invitations */
+  
+  /* Glassmorphism Effects */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .glass-effect-dark {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Neumorphism Effects */
+  .neomorphism-light {
+    background: #f0f0f0;
+    border-radius: 20px;
+    box-shadow: 
+      8px 8px 16px rgba(163, 177, 198, 0.6),
+      -8px -8px 16px rgba(255, 255, 255, 0.8);
+  }
+
+  .neomorphism-dark {
+    background: #2d2d2d;
+    border-radius: 20px;
+    box-shadow: 
+      8px 8px 16px rgba(0, 0, 0, 0.4),
+      -8px -8px 16px rgba(58, 58, 58, 0.8);
+  }
+
+  /* Floating Elements Animation */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-20px) rotate(5deg); }
+    50% { transform: translateY(-10px) rotate(10deg); }
+    75% { transform: translateY(-15px) rotate(5deg); }
+  }
+
+  @keyframes floatReverse {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(15px) rotate(-5deg); }
+    50% { transform: translateY(10px) rotate(-10deg); }
+    75% { transform: translateY(20px) rotate(-5deg); }
+  }
+
+  .floating-element {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .floating-element-reverse {
+    animation: floatReverse 6s ease-in-out infinite;
+  }
+
+  /* Particle Animation */
+  @keyframes particleFloat {
+    0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.8; }
+    25% { transform: translateY(-30px) translateX(10px) rotate(90deg); opacity: 0.6; }
+    50% { transform: translateY(-20px) translateX(-5px) rotate(180deg); opacity: 0.4; }
+    75% { transform: translateY(-40px) translateX(8px) rotate(270deg); opacity: 0.6; }
+    100% { transform: translateY(-50px) translateX(0) rotate(360deg); opacity: 0; }
+  }
+
+  .particle {
+    animation: particleFloat 12s linear infinite;
+  }
+
+  /* Gradient Animations */
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .animated-gradient {
+    background: linear-gradient(
+      -45deg,
+      var(--gradient-color-1, #ff6b6b),
+      var(--gradient-color-2, #4ecdc4),
+      var(--gradient-color-3, #45b7d1),
+      var(--gradient-color-4, #f9ca24)
+    );
+    background-size: 400% 400%;
+    animation: gradientShift 8s ease infinite;
+  }
+
+  /* Luxury Gradient Backgrounds */
+  .luxury-gradient-1 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .luxury-gradient-2 {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  .luxury-gradient-3 {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  .luxury-gradient-4 {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  }
+
+  .luxury-gradient-5 {
+    background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  }
+
+  .luxury-gradient-6 {
+    background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  }
+
+  /* Neon Glow Effects */
+  .neon-glow {
+    text-shadow: 
+      0 0 5px currentColor,
+      0 0 10px currentColor,
+      0 0 15px currentColor,
+      0 0 20px currentColor;
+  }
+
+  .neon-border {
+    border: 2px solid currentColor;
+    box-shadow: 
+      0 0 10px currentColor,
+      inset 0 0 10px currentColor;
+  }
+
+  /* Premium Typography Systems */
+  
+  /* Luxury Serif Typography */
+  .typography-luxury-serif {
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Cormorant Garamond', serif;
+    --font-accent: 'Dancing Script', cursive;
+  }
+  
+  .typography-luxury-serif h1,
+  .typography-luxury-serif h2,
+  .typography-luxury-serif h3 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  
+  .typography-luxury-serif p,
+  .typography-luxury-serif span {
+    font-family: var(--font-body);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
+  }
+  
+  .typography-luxury-serif .accent {
+    font-family: var(--font-accent);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  /* Cyberpunk Typography */
+  .typography-cyberpunk {
+    --font-heading: 'Orbitron', monospace;
+    --font-body: 'JetBrains Mono', monospace;
+    --font-accent: 'Rajdhani', sans-serif;
+  }
+  
+  .typography-cyberpunk h1,
+  .typography-cyberpunk h2,
+  .typography-cyberpunk h3 {
+    font-family: var(--font-heading);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+    text-transform: uppercase;
+  }
+  
+  .typography-cyberpunk p,
+  .typography-cyberpunk span {
+    font-family: var(--font-body);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    line-height: 1.4;
+  }
+  
+  .typography-cyberpunk .accent {
+    font-family: var(--font-accent);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Modern Clean Typography */
+  .typography-modern-clean {
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-accent: 'Poppins', sans-serif;
+  }
+  
+  .typography-modern-clean h1,
+  .typography-modern-clean h2,
+  .typography-modern-clean h3 {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+  
+  .typography-modern-clean p,
+  .typography-modern-clean span {
+    font-family: var(--font-body);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.5;
+  }
+  
+  .typography-modern-clean .accent {
+    font-family: var(--font-accent);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* Organic Typography */
+  .typography-organic {
+    --font-heading: 'Crimson Text', serif;
+    --font-body: 'Source Sans Pro', sans-serif;
+    --font-accent: 'Pacifico', cursive;
+  }
+  
+  .typography-organic h1,
+  .typography-organic h2,
+  .typography-organic h3 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  
+  .typography-organic p,
+  .typography-organic span {
+    font-family: var(--font-body);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.6;
+  }
+  
+  .typography-organic .accent {
+    font-family: var(--font-accent);
+    font-weight: 400;
+    letter-spacing: 0.02em;
+  }
+
+  /* Fresh Typography */
+  .typography-fresh {
+    --font-heading: 'Montserrat', sans-serif;
+    --font-body: 'Open Sans', sans-serif;
+    --font-accent: 'Nunito', sans-serif;
+  }
+  
+  .typography-fresh h1,
+  .typography-fresh h2,
+  .typography-fresh h3 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  .typography-fresh p,
+  .typography-fresh span {
+    font-family: var(--font-body);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.55;
+  }
+  
+  .typography-fresh .accent {
+    font-family: var(--font-accent);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* Default Typography */
+  .typography-default {
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-accent: 'Poppins', sans-serif;
+  }
+  
+  .typography-default h1,
+  .typography-default h2,
+  .typography-default h3 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  
+  .typography-default p,
+  .typography-default span {
+    font-family: var(--font-body);
+    font-weight: 400;
+    letter-spacing: 0em;
+    line-height: 1.5;
+  }
+  
+  .typography-default .accent {
+    font-family: var(--font-accent);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* Legacy Typography Classes (for backward compatibility) */
+  .typography-luxury {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .typography-modern {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+  }
+
+  /* Dramatic Text Effects */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--template-primary), var(--template-accent));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% 200%;
+    animation: gradientShift 8s ease infinite;
+  }
+
+  .text-shadow-glow {
+    text-shadow: 
+      0 0 10px var(--template-primary),
+      0 0 20px var(--template-primary),
+      0 0 40px var(--template-primary);
+  }
+
+  .text-shadow-elegant {
+    text-shadow: 
+      0 1px 3px rgba(0,0,0,0.12),
+      0 1px 2px rgba(0,0,0,0.24);
+  }
+
+  .text-outline {
+    -webkit-text-stroke: 2px var(--template-primary);
+    color: transparent;
+  }
+
+  /* Responsive Typography */
+  @media (max-width: 768px) {
+    .typography-luxury-serif h1,
+    .typography-cyberpunk h1,
+    .typography-modern-clean h1,
+    .typography-organic h1,
+    .typography-fresh h1,
+    .typography-default h1 {
+      font-size: clamp(2rem, 5vw, 4rem);
+    }
+    
+    .typography-luxury-serif h2,
+    .typography-cyberpunk h2,
+    .typography-modern-clean h2,
+    .typography-organic h2,
+    .typography-fresh h2,
+    .typography-default h2 {
+      font-size: clamp(1.5rem, 4vw, 3rem);
+    }
+  }
+
+  /* Interactive Hover Effects */
+  .hover-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+  }
+
+  .hover-glow {
+    transition: box-shadow 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Sophisticated Card Effects */
+  .premium-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 24px;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 1px 0 rgba(255, 255, 255, 0.8) inset;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .premium-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.15),
+      0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  }
+
+  /* Dynamic Backgrounds */
+  .dynamic-background {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dynamic-background::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: backgroundMove 20s linear infinite;
+  }
+
+  @keyframes backgroundMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
+
+  /* Morphing Shapes */
+  @keyframes morphing {
+    0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  }
+
+  .morphing-shape {
+    animation: morphing 8s ease-in-out infinite;
+  }
+
+  /* Retro Futurism Effects */
+  .retro-grid {
+    background-image: 
+      linear-gradient(rgba(255, 0, 255, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 0, 255, 0.3) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 10s linear infinite;
+  }
+
+  @keyframes gridMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 50px 50px; }
+  }
+
+  .retro-scan-lines {
+    position: relative;
+  }
+
+  .retro-scan-lines::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, 0.03) 2px,
+      rgba(255, 255, 255, 0.03) 4px
+    );
+    pointer-events: none;
+  }
 }
