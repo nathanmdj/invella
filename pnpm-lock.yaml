@@ -365,6 +365,21 @@ importers:
       '@kit/tsconfig':
         specifier: workspace:*
         version: link:../../../tooling/typescript
+      '@types/react':
+        specifier: 19.1.6
+        version: 19.1.6
+      '@types/react-dom':
+        specifier: 19.1.5
+        version: 19.1.5(@types/react@19.1.6)
+      next:
+        specifier: 15.3.2
+        version: 15.3.2(@playwright/test@1.52.0)(babel-plugin-react-compiler@19.1.0-rc.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react:
+        specifier: 19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: 19.1.0
+        version: 19.1.0(react@19.1.0)
 
   packages/features/rsvp:
     dependencies:
