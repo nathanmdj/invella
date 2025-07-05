@@ -364,19 +364,159 @@ export async function getGuestData(invitationId: string): Promise<{
 }
 
 /**
- * Get template data by ID (mock implementation for now)
+ * Get template data by ID from database
  */
 export async function getTemplateData(templateId?: string): Promise<any> {
-  // Mock template data - in production this would come from the database
-  return {
-    id: templateId || 'template-1',
-    name: 'Classic Wedding',
-    category: templateId ? 'wedding' : 'general',
-    design_config: {
-      primaryColor: '#3b82f6',
-      accentColor: '#f59e0b',
-      fontFamily: 'serif',
-      layout: 'classic'
+  try {
+    const supabase = getSupabaseServerClient();
+    
+    // If no template ID provided, get the first public template as fallback
+    if (!templateId) {
+      const { data, error } = await supabase
+        .from('invitation_templates')
+        .select('*')
+        .eq('is_public', true)
+        .limit(1)
+        .single();
+      
+      if (error || !data) {
+        // Return fallback template if database query fails
+        return {
+          id: 'fallback-template',
+          name: 'Classic Template',
+          category: 'general',
+          design_config: {
+            primaryColor: '#3b82f6',
+            accentColor: '#f59e0b',
+            fontFamily: 'serif',
+            layout: 'classic'
+          }
+        };
+      }
+      
+      return {
+        ...data,
+        design_config: typeof data.design_config === 'string' 
+          ? JSON.parse(data.design_config) 
+          : data.design_config
+      };
     }
-  };
+    
+    // Fetch specific template by ID
+    const { data, error } = await supabase
+      .from('invitation_templates')
+      .select('*')
+      .eq('id', templateId)
+      .eq('is_public', true)
+      .single();
+    
+    if (error || !data) {
+      console.error('Error fetching template:', error);
+      // Return fallback template if specific template not found
+      return {
+        id: templateId,
+        name: 'Classic Template',
+        category: 'general',
+        design_config: {
+          primaryColor: '#3b82f6',
+          accentColor: '#f59e0b',
+          fontFamily: 'serif',
+          layout: 'classic'
+        }
+      };
+    }
+    
+    return {
+      ...data,
+      design_config: typeof data.design_config === 'string' 
+        ? JSON.parse(data.design_config) 
+        : data.design_config
+    };
+  } catch (error) {
+    console.error('Error in getTemplateData:', error);
+    // Return fallback template on error
+    return {
+      id: templateId || 'fallback-template',
+      name: 'Classic Template',
+      category: 'general',
+      design_config: {
+        primaryColor: '#3b82f6',
+        accentColor: '#f59e0b',
+        fontFamily: 'serif',
+        layout: 'classic'
+      }
+    };
+  }
+}
+
+/**
+ * Get a specific template by ID (for authenticated users)
+ */
+export async function getTemplateById(templateId: string): Promise<any | null> {
+  try {
+    const supabase = getSupabaseServerClient();
+    
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let query = supabase
+      .from('invitation_templates')
+      .select('*')
+      .eq('id', templateId);
+    
+    // If user is authenticated, they can access public templates or their own templates
+    if (user) {
+      query = query.or(`is_public.eq.true,created_by.eq.${user.id}`);
+    } else {
+      // Anonymous users can only access public templates
+      query = query.eq('is_public', true);
+    }
+    
+    const { data, error } = await query.single();
+    
+    if (error || !data) {
+      console.error('Error fetching template by ID:', error);
+      return null;
+    }
+    
+    return {
+      ...data,
+      design_config: typeof data.design_config === 'string' 
+        ? JSON.parse(data.design_config) 
+        : data.design_config
+    };
+  } catch (error) {
+    console.error('Error in getTemplateById:', error);
+    return null;
+  }
+}
+
+/**
+ * Get all public templates
+ */
+export async function getPublicTemplates(): Promise<any[]> {
+  try {
+    const supabase = getSupabaseServerClient();
+    
+    const { data, error } = await supabase
+      .from('invitation_templates')
+      .select('*')
+      .eq('is_public', true)
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error fetching public templates:', error);
+      return [];
+    }
+    
+    return (data || []).map(template => ({
+      ...template,
+      design_config: typeof template.design_config === 'string' 
+        ? JSON.parse(template.design_config) 
+        : template.design_config
+    }));
+  } catch (error) {
+    console.error('Error in getPublicTemplates:', error);
+    return [];
+  }
 } 
