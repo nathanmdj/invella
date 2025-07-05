@@ -48,7 +48,8 @@
   }
 
   /* Progressive scrolling improvements */
-  .invitation-frames {
+  .invitation-frames,
+  .scrollbar-hide {
     scroll-behavior: smooth;
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
@@ -60,7 +61,8 @@
     scroll-padding-top: 0px;
   }
 
-  .invitation-frames::-webkit-scrollbar {
+  .invitation-frames::-webkit-scrollbar,
+  .scrollbar-hide::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Opera */
   }
 
