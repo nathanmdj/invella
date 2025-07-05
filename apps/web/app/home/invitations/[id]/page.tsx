@@ -16,11 +16,11 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 interface InvitationDetailsPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function InvitationDetailsPage({ params }: InvitationDetailsPageProps) {
-  const invitationId = params.id;
+  const { id: invitationId } = await params;
 
   const [invitation, guestData] = await Promise.all([
     getUserInvitation(invitationId),
