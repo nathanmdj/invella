@@ -99,7 +99,7 @@ export function TemplateSelector({
 
       {/* Templates Grid */}
       {!isLoading && !error && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
           {/* Custom Design Option */}
           {onCustomDesign && (
             <Card 
@@ -187,18 +187,31 @@ export function TemplateSelector({
                   </p>
                   
                   {/* Color Palette */}
-                  {template.design_config.primaryColor && template.design_config.accentColor && (
+                  {template.design_config && (template.design_config.primaryColor || template.design_config.accentColor) && (
                     <div className="flex items-center space-x-2 pt-2">
                       <span className="text-xs text-muted-foreground">Colors:</span>
                       <div className="flex space-x-1">
-                        <div 
-                          className="w-4 h-4 rounded-full border border-gray-200"
-                          style={{ backgroundColor: template.design_config.primaryColor }}
-                        />
-                        <div 
-                          className="w-4 h-4 rounded-full border border-gray-200"
-                          style={{ backgroundColor: template.design_config.accentColor }}
-                        />
+                        {template.design_config.primaryColor && (
+                          <div 
+                            className="w-4 h-4 rounded-full border border-gray-200 shadow-sm"
+                            style={{ backgroundColor: template.design_config.primaryColor }}
+                            title={`Primary: ${template.design_config.primaryColor}`}
+                          />
+                        )}
+                        {template.design_config.accentColor && (
+                          <div 
+                            className="w-4 h-4 rounded-full border border-gray-200 shadow-sm"
+                            style={{ backgroundColor: template.design_config.accentColor }}
+                            title={`Accent: ${template.design_config.accentColor}`}
+                          />
+                        )}
+                        {template.design_config.backgroundColor && (
+                          <div 
+                            className="w-4 h-4 rounded-full border border-gray-200 shadow-sm"
+                            style={{ backgroundColor: template.design_config.backgroundColor }}
+                            title={`Background: ${template.design_config.backgroundColor}`}
+                          />
+                        )}
                       </div>
                     </div>
                   )}
