@@ -1,0 +1,2 @@
+-create multiple commits of the changes. don't include claude as co-author
+-use conventional commits best practices but it should start on capital letter
