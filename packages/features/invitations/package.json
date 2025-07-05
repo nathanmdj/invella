@@ -23,6 +23,8 @@
     "./invitation-loading": "./src/components/invitation-loading.tsx",
     "./invitation-error": "./src/components/invitation-error.tsx",
     "./invitation-frames-wrapper": "./src/components/invitation-frames-wrapper.tsx",
+    "./template-admin-list": "./src/components/template-management/template-admin-list.tsx",
+    "./template-form": "./src/components/template-management/template-form.tsx",
     "./server/actions": "./src/server/actions.ts",
     "./server/utils": "./src/server/utils.ts",
     "./hooks/use-guest-data": "./src/hooks/use-guest-data.ts",
