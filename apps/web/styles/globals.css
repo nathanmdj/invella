@@ -46,4 +46,154 @@
   textarea::placeholder {
     color: theme(--color-muted-foreground);
   }
+
+  /* Progressive scrolling improvements */
+  .invitation-frames {
+    scroll-behavior: smooth;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    overscroll-behavior: contain;
+    /* Enable hardware acceleration */
+    will-change: scroll-position;
+    transform: translateZ(0);
+    /* Progressive scrolling without snap */
+    scroll-padding-top: 0px;
+  }
+
+  .invitation-frames::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* Enhanced progressive frame transitions */
+  .invitation-frames > div > div {
+    /* Optimize for smooth transitions */
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    /* Ensure proper frame isolation */
+    contain: layout style paint;
+    isolation: isolate;
+    position: relative;
+    /* Force exact viewport height for progressive transitions */
+    height: 100vh;
+    min-height: 100vh;
+    max-height: 100vh;
+  }
+
+  /* Ultra-smooth slow snap scrolling */
+  .scroll-smooth-enhanced {
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    /* Custom smooth scroll duration */
+    --scroll-duration: 4s;
+  }
+  
+  /* Smooth snap with longer duration */
+  .scroll-smooth-enhanced {
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    /* Add momentum scrolling for iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Slower, smoother scrolling */
+    scroll-padding: 0px;
+  }
+
+  /* Custom smooth transition keyframes */
+  @keyframes smoothSlideIn {
+    0% {
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+    }
+    50% {
+      opacity: 0.5;
+      transform: translateY(15px) scale(0.975);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes smoothSlideOut {
+    0% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: translateY(-15px) scale(0.975);
+    }
+    100% {
+      opacity: 0.2;
+      transform: translateY(-30px) scale(0.95);
+    }
+  }
+
+  /* Ultra-smooth frame transition */
+  @keyframes ultraSmoothTransition {
+    0% {
+      opacity: 0;
+      transform: translateY(40px) scale(0.94) rotateX(2deg);
+    }
+    25% {
+      opacity: 0.25;
+      transform: translateY(30px) scale(0.96) rotateX(1.5deg);
+    }
+    50% {
+      opacity: 0.5;
+      transform: translateY(20px) scale(0.98) rotateX(1deg);
+    }
+    75% {
+      opacity: 0.75;
+      transform: translateY(10px) scale(0.99) rotateX(0.5deg);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1) rotateX(0deg);
+    }
+  }
+
+  /* Enhanced frame transitions with ultra-smooth snap */
+  .invitation-frames .hero-frame,
+  .invitation-frames .details-frame,
+  .invitation-frames .rsvp-frame,
+  .invitation-frames .gallery-frame {
+    transition: all 4s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center center;
+    /* Ensure each frame covers its container completely */
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    min-width: 100%;
+    background-color: white; /* Fallback background */
+  }
+
+  /* Ensure frame backgrounds cover completely */
+  .invitation-frames .hero-frame > div:first-child,
+  .invitation-frames .details-frame > div:first-child,
+  .invitation-frames .rsvp-frame > div:first-child,
+  .invitation-frames .gallery-frame > div:first-child {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  /* Smooth backdrop filters */
+  .invitation-frames [class*="backdrop-blur"] {
+    transition: backdrop-filter 1.5s ease-out;
+  }
+
+  /* Reduced motion for accessibility */
+  @media (prefers-reduced-motion: reduce) {
+    .invitation-frames {
+      scroll-behavior: auto;
+      scroll-snap-type: none;
+    }
+    
+    .invitation-frames .animate-in {
+      animation: none;
+    }
+  }
 }
