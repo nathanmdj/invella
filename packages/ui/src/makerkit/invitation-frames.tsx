@@ -95,10 +95,8 @@ export function InvitationFrames({
   return (
     <motion.div 
       ref={containerRef}
-      className={cn('invitation-frames relative w-full h-screen overflow-y-auto overflow-x-hidden', className)}
+      className={cn('invitation-frames fixed inset-0 w-full h-full overflow-y-auto overflow-x-hidden scrollbar-hide', className)}
       style={{ 
-        height: '100vh',
-        maxHeight: '100vh',
         scrollSnapType: 'y mandatory',
         scrollBehavior: 'smooth'
       }}
@@ -193,14 +191,7 @@ export function InvitationFrames({
         )}
       </AnimatePresence>
 
-      {/* Scroll Indicator - Simplified */}
-      {frames.length > 1 && currentFrame < frames.length - 1 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 opacity-60 hover:opacity-100 transition-opacity duration-300">
-          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3 border border-white/30 animate-bounce">
-            <ChevronRight className="w-5 h-5 text-white rotate-90" />
-          </div>
-        </div>
-      )}
+
     </motion.div>
   );
 }
@@ -366,39 +357,10 @@ function HeroFrame({
   );
 
   return (
-    <div className={cn('hero-frame min-h-screen w-full flex items-center justify-center relative overflow-hidden isolate bg-white', className)}>
-      {/* Animated Background */}
-      <motion.div 
-        className="absolute inset-0"
-        style={{ background: defaultBackground }}
-        initial={{ opacity: 0, scale: 1.1 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, ease: 'easeOut' }}
-      />
-      
-      {/* Background Image with parallax */}
-      <AnimatePresence>
-        {invitation.image_url && (
-          <motion.div 
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 1.1 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.5, ease: 'easeOut' }}
-          >
-            <img 
-              src={invitation.image_url} 
-              alt=""
-              className="w-full h-full object-cover"
-            />
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.5 }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+    <div 
+      className={cn('hero-frame min-h-screen w-full flex items-center justify-center relative', className)}
+      style={{ background: defaultBackground }}
+    >
       
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
@@ -493,15 +455,10 @@ function DetailsFrame({
   );
 
   return (
-    <div className={cn('details-frame min-h-screen w-full flex items-center justify-center relative overflow-hidden isolate bg-white', className)}>
-      {/* Background */}
-      <motion.div 
-        className="absolute inset-0"
-        style={{ background: defaultBackground }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, ease: 'easeOut' }}
-      />
+    <div 
+      className={cn('details-frame min-h-screen w-full flex items-center justify-center relative', className)}
+      style={{ background: defaultBackground }}
+    >
       
       {/* Content */}
       <div className="relative z-10 w-full max-w-4xl mx-auto px-6">
@@ -637,57 +594,10 @@ function RSVPFrame({
   );
 
   return (
-    <div className={cn('rsvp-frame min-h-screen w-full flex items-center justify-center relative overflow-hidden isolate bg-white', className)}>
-      {/* Background */}
-      <motion.div 
-        className="absolute inset-0"
-        style={{ background: defaultBackground }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, ease: 'easeOut' }}
-      />
-      
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0">
-        <motion.div 
-          className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.6, 0.3]
-          }}
-          transition={{ 
-            duration: 4,
-            repeat: Infinity,
-            ease: 'easeInOut'
-          }}
-        />
-        <motion.div 
-          className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-white/10 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.3, 1],
-            opacity: [0.2, 0.5, 0.2]
-          }}
-          transition={{ 
-            duration: 5,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 1
-          }}
-        />
-        <motion.div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white/5 rounded-full blur-3xl"
-          animate={{ 
-            scale: [1, 1.1, 1],
-            opacity: [0.1, 0.3, 0.1]
-          }}
-          transition={{ 
-            duration: 6,
-            repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 2
-          }}
-        />
-      </div>
+    <div 
+      className={cn('rsvp-frame min-h-screen w-full flex items-center justify-center relative', className)}
+      style={{ background: defaultBackground }}
+    >
       
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-4xl mx-auto w-full">
@@ -808,15 +718,10 @@ function GalleryFrame({
   );
 
   return (
-    <div className={cn('gallery-frame min-h-screen w-full flex items-center justify-center relative overflow-hidden isolate bg-white', className)}>
-      {/* Background */}
-      <motion.div 
-        className="absolute inset-0"
-        style={{ background: invitation.image_url ? 'black' : defaultBackground }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, ease: 'easeOut' }}
-      />
+    <div 
+      className={cn('gallery-frame min-h-screen w-full flex items-center justify-center relative', className)}
+      style={{ background: invitation.image_url ? 'black' : defaultBackground }}
+    >
       
       {/* Content */}
       <div className="relative z-10 w-full h-full">
