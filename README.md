@@ -1,6 +1,6 @@
 # Invella - Digital Invitations & RSVP
 
-Create beautiful digital invitations and manage RSVPs effortlessly with this modern PWA web application.
+Create beautiful digital invitations and manage RSVPs effortlessly with this modern PWA web application. 
 
 🎉 **Perfect for any event:**
 - Weddings and engagements
